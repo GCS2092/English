@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CTI Espagnol">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#c0392b">
+<title>CTI — Espagnol</title>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+const manifest = {
+  name: "CTI — Cahier Espagnol",
+  short_name: "CTI Español",
+  display: "standalone",
+  background_color: "#c0392b",
+  theme_color: "#c0392b",
+  orientation: "portrait-primary",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23c0392b'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='%23f1c40f' font-family='serif'%3E🇪🇸%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" }
+  ]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+const mLink = document.createElement('link');
+mLink.rel = 'manifest';
+mLink.href = URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f6; --bg2: #f0ede6; --bg3: #e8e4db;
+  --text: #1c1a14; --text2: #6b6860; --text3: #9a9890;
+  --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
+  --accent: #c0392b; --gold: #f1c40f;
+  --green-bg: #e8f5d8; --green-bd: #4a8a1a; --green-tx: #2d5a0e;
+  --red-bg: #fdeaea; --red-bd: #8a1a1a; --red-tx: #5a0e0e;
+  --blue-bg: #fef9e7; --blue-tx: #c0392b;
+  --radius: 14px; --radius-sm: 10px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16140f; --bg2: #201e17; --bg3: #2a2720;
+    --text: #f0ece2; --text2: #a8a49a; --text3: #706e66;
+    --border: rgba(255,255,255,0.10); --border2: rgba(255,255,255,0.18);
+    --green-bg: #0e2a04; --green-bd: #2d5a0e; --green-tx: #a8d878;
+    --red-bg: #2a0808; --red-bd: #5a0e0e; --red-tx: #e88888;
+    --blue-bg: #2a1a08; --blue-tx: #f1c40f;
+  }
+}
+html { height: 100%; }
+body {
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg3); color: var(--text);
+  min-height: 100%; overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--accent);
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.top-bar .logo-sm {
+  background: var(--gold); color: #111;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px; border-radius: 4px;
+  letter-spacing: 0.08em; white-space: nowrap;
+}
+.top-bar h1 { color: #fff; font-size: 15px; font-weight: 600; flex: 1; }
+.score-pill {
+  background: rgba(255,255,255,0.18); color: #fff;
+  font-size: 13px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+}
+.prog-bar { height: 3px; background: rgba(255,255,255,0.2); }
+.prog-fill { height: 100%; background: var(--gold); transition: width 0.4s ease; width: 0%; }
+.tabs-wrap {
+  overflow-x: auto; padding: 12px 14px 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.tabs { display: flex; gap: 7px; min-width: max-content; }
+.tab {
+  padding: 8px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border2); font-size: 13px;
+  cursor: pointer; background: var(--bg); color: var(--text2);
+  font-weight: 500; white-space: nowrap;
+  -webkit-user-select: none; transition: all 0.15s;
+}
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.content { padding: 12px 14px calc(var(--safe-bot) + 80px); }
+.section { display: none; }
+.section.active { display: block; }
+.card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  margin-bottom: 12px;
+}
+.card-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--text3); text-transform: uppercase; margin-bottom: 8px; display: block;
+}
+.question { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+.question em { font-style: italic; color: var(--text2); }
+.dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+.dot.ok { background: var(--green-bd); }
+.dot.ko { background: var(--red-bd); }
+.dot.cur { background: var(--accent); }
+.options { display: flex; flex-direction: column; gap: 9px; }
+.option {
+  padding: 13px 15px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 15px;
+  color: var(--text); background: transparent;
+  text-align: left; line-height: 1.4; cursor: pointer;
+  -webkit-user-select: none; transition: background 0.1s;
+  font-family: inherit;
+}
+.option:active:not(.locked) { background: var(--bg2); }
+.option.correct { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+.option.wrong { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+.option.reveal { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+.fb {
+  margin-top: 10px; padding: 11px 14px;
+  border-radius: var(--radius-sm); font-size: 14px;
+  display: none; line-height: 1.5;
+}
+.fb.ok { background: var(--green-bg); color: var(--green-tx); display: block; border-left: 3px solid var(--green-bd); }
+.fb.ko { background: var(--red-bg); color: var(--red-tx); display: block; border-left: 3px solid var(--red-bd); }
+.btn {
+  padding: 11px 20px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 14px;
+  cursor: pointer; background: transparent; color: var(--text);
+  font-family: inherit; font-weight: 500; -webkit-user-select: none;
+}
+.btn:active { opacity: 0.75; }
+.btn:disabled { opacity: 0.35; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nav { display: flex; justify-content: flex-end; margin-top: 12px; }
+.fill-in {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: inherit; color: var(--text);
+  background: var(--bg2); margin-bottom: 10px; outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+.fill-in:focus { border-color: var(--accent); }
+.hint {
+  font-size: 12px; color: var(--text3);
+  padding: 6px 10px; background: var(--bg2);
+  border-radius: 8px; display: inline-block; margin-bottom: 10px;
+}
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.m-item {
+  padding: 12px 10px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 13px;
+  text-align: center; color: var(--text); background: transparent;
+  cursor: pointer; font-family: inherit; line-height: 1.4;
+  -webkit-user-select: none;
+}
+.m-item:active { background: var(--bg2); }
+.m-item.sel { background: var(--blue-bg); border-color: var(--accent); }
+.m-item.m-ok { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); pointer-events: none; }
+.m-item.m-ko { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+.bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  padding: 8px 16px; border: 1.5px solid var(--border2);
+  border-radius: 20px; font-size: 14px;
+  color: var(--text); background: transparent;
+  cursor: pointer; font-family: inherit; -webkit-user-select: none;
+}
+.chip:active:not(.used) { background: var(--bg2); }
+.chip.sel-chip { border-color: var(--accent); background: var(--blue-bg); color: var(--blue-tx); }
+.chip.used { opacity: 0.28; pointer-events: none; }
+.diag-line { margin: 10px 0; font-size: 15px; line-height: 1.65; }
+.diag-line strong { color: var(--accent); font-weight: 700; }
+.blank {
+  display: inline-block; min-width: 80px; border-bottom: 2px solid var(--border2);
+  margin: 0 4px; text-align: center; padding: 0 6px;
+  color: var(--text); font-size: 15px; cursor: pointer;
+}
+.blank.b-ok { border-bottom-color: var(--green-bd); color: var(--green-tx); }
+.blank.b-ko { border-bottom-color: var(--red-bd); color: var(--red-tx); }
+.info-box {
+  background: var(--blue-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 14px;
+  font-size: 13px; color: var(--blue-tx); line-height: 1.6;
+  margin-bottom: 12px;
+}
+.congrats { text-align: center; padding: 2rem 1rem; }
+.congrats .emoji { font-size: 48px; margin-bottom: 8px; }
+.congrats h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.congrats p { color: var(--text2); font-size: 15px; margin-bottom: 20px; }
+textarea.fill-in { resize: none; min-height: 72px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo-sm">CTI</div>
+  <h1>🇪🇸 Español</h1>
+  <div class="score-pill" id="sv">0 / 0</div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="sf"></div></div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showSec('qcm',this)">📝 QCM</button>
+    <button class="tab" onclick="showSec('conj',this)">🔤 Conjugaison</button>
+    <button class="tab" onclick="showSec('lac',this)">✏️ Lacunes</button>
+    <button class="tab" onclick="showSec('asso',this)">🔗 Association</button>
+    <button class="tab" onclick="showSec('voc',this)">📖 Vocabulaire</button>
+    <button class="tab" onclick="showSec('trad',this)">🌍 Traduction</button>
+    <button class="tab" onclick="showSec('diag',this)">💬 Dialogue</button>
+  </div>
+</div>
+
+<div class="content">
+  <div id="sec-qcm" class="section active"></div>
+  <div id="sec-conj" class="section"></div>
+  <div id="sec-lac" class="section"></div>
+  <div id="sec-asso" class="section"></div>
+  <div id="sec-voc" class="section"></div>
+  <div id="sec-trad" class="section"></div>
+  <div id="sec-diag" class="section"></div>
+</div>
+
+<a href="index.html" style="
+  position:fixed;bottom:20px;right:16px;z-index:999;
+  background:#f1c40f;color:#111;
+  padding:10px 18px;border-radius:20px;
+  font-weight:700;font-size:13px;
+  text-decoration:none;
+  box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  font-family:-apple-system,sans-serif;
+">🏠 Accueil →</a>
+
+<script>
+'use strict';
+let totOk=0,totAns=0;
+function score(ok){
+  totAns++;if(ok)totOk++;
+  document.getElementById('sv').textContent=totOk+' / '+totAns;
+  const p=totAns?Math.round(totOk/totAns*100):0;
+  document.getElementById('sf').style.width=p+'%';
+}
+function showSec(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo(0,0);
+}
+function dots(data,cur,res){
+  return data.map((_,i)=>{
+    let c='dot';
+    if(i<cur)c+=res[i]?' ok':' ko';
+    else if(i===cur)c+=' cur';
+    return '<div class="'+c+'"></div>';
+  }).join('');
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ════════ QCM ════════ */
+const QD=[
+  {t:'Salutations',q:'Comment dit-on "Bonjour" en espagnol ?',o:['Hola','Buenas noches','Adiós','Hasta luego'],a:0},
+  {t:'Salutations',q:'"Buenos días" signifie :',o:['Bonsoir','Bonne nuit','Bonjour (matin)','Au revoir'],a:2},
+  {t:'Salutations',q:'"¿Cómo estás?" signifie :',o:['Comment t\'appelles-tu ?','Comment vas-tu ?','Où es-tu ?','Quel âge as-tu ?'],a:1},
+  {t:'Salutations',q:'"Mucho gusto" signifie :',o:['Merci beaucoup','Enchanté','S\'il te plaît','De rien'],a:1},
+  {t:'Articles',q:'L\'article défini masculin singulier est :',o:['la','los','el','las'],a:2},
+  {t:'Articles',q:'L\'article défini féminin pluriel est :',o:['el','la','los','las'],a:3},
+  {t:'Articles',q:'L\'article indéfini masculin est :',o:['una','unos','un','unas'],a:2},
+  {t:'Pronoms',q:'Comment dit-on "nous" en espagnol ?',o:['vosotros','ellos','nosotros','ustedes'],a:2},
+  {t:'Pronoms',q:'"Vosotros" correspond à :',o:['ils','vous (Espagne)','nous','eux'],a:1},
+  {t:'Ser / Estar',q:'"Ser" s\'utilise pour :',o:['une état temporaire','une caractéristique permanente','une position','une émotion du moment'],a:1},
+  {t:'Ser / Estar',q:'"Estoy cansado" signifie :',o:['Je suis fatigué (toujours)','Je suis fatigué (maintenant)','J\'étais fatigué','Je serai fatigué'],a:1},
+  {t:'Ser / Estar',q:'Forme correcte : "Ella ___ médica"',o:['está','estás','es','son'],a:2},
+  {t:'Ser / Estar',q:'Forme correcte : "¿Dónde ___ el baño?"',o:['es','soy','está','eres'],a:2},
+  {t:'Présent',q:'Conjugaison de "hablar" à "yo" :',o:['hablo','hablas','habla','hablamos'],a:0},
+  {t:'Présent',q:'Conjugaison de "comer" à "él" :',o:['como','comes','come','comen'],a:2},
+  {t:'Présent',q:'Conjugaison de "vivir" à "nosotros" :',o:['vivimos','vivís','viven','vivo'],a:0},
+  {t:'Verbes irréguliers',q:'Conjugaison de "tener" à "yo" :',o:['teno','tienes','tengo','tiene'],a:2},
+  {t:'Verbes irréguliers',q:'Conjugaison de "ir" à "yo" :',o:['iro','voy','vo','ibo'],a:1},
+  {t:'Verbes irréguliers',q:'Conjugaison de "poder" à "él" :',o:['pode','puedo','podes','puede'],a:3},
+  {t:'Nombres',q:'"Veinte" correspond à :',o:['12','20','22','200'],a:1},
+  {t:'Nombres',q:'"Cincuenta" correspond à :',o:['15','500','50','5'],a:2},
+  {t:'Nombres',q:'"Cien" correspond à :',o:['10','1000','100','1100'],a:2},
+  {t:'Vocabulaire',q:'"La casa" signifie :',o:['La rue','La voiture','La maison','L\'école'],a:2},
+  {t:'Vocabulaire',q:'"El trabajo" signifie :',o:['Le voyage','Le travail','Le temps','Le train'],a:1},
+  {t:'Vocabulaire',q:'"La familia" signifie :',o:['La fête','La femme','La famille','La force'],a:2},
+  {t:'Vocabulaire',q:'"Hablar" signifie :',o:['manger','boire','parler','dormir'],a:2},
+  {t:'Vocabulaire',q:'"Querer" signifie :',o:['savoir','pouvoir','vouloir / aimer','devoir'],a:2},
+  {t:'Temps',q:'Comment dit-on "hier" en espagnol ?',o:['hoy','mañana','ayer','ahora'],a:2},
+  {t:'Temps',q:'"Mañana" signifie :',o:['ce matin','hier','maintenant','demain / matin'],a:3},
+  {t:'Questions',q:'"¿Dónde?" signifie :',o:['Quand ?','Pourquoi ?','Où ?','Comment ?'],a:2},
+  {t:'Questions',q:'"¿Por qué?" signifie :',o:['Pour quoi faire ?','Pourquoi ?','Comment ?','Combien ?'],a:1},
+  {t:'Questions',q:'"¿Cuánto cuesta?" signifie :',o:['Combien y en a-t-il ?','Quel âge as-tu ?','Combien ça coûte ?','Qu\'est-ce que c\'est ?'],a:2},
+  {t:'Adjectifs',q:'Forme correcte : "una chica ___"',o:['alto','altas','alta','altos'],a:2},
+  {t:'Adjectifs',q:'"Bonito/a" signifie :',o:['grand','petit','beau/belle','nouveau'],a:2},
+  {t:'Adjectifs',q:'Comment dit-on "intelligent" (masculin) ?',o:['inteligenta','inteligentes','inteligente','inteligento'],a:2},
+  {t:'Prépositions',q:'"Antes de" signifie :',o:['après','pendant','avant','depuis'],a:2},
+  {t:'Prépositions',q:'"Cerca de" signifie :',o:['loin de','à côté de','près de','en face de'],a:2},
+  {t:'Passé',q:'Passé de "hablar" (yo) au pretérito perfecto :',o:['hablé','he hablado','hablaba','hablaré'],a:1},
+  {t:'Passé',q:'Passé simple de "comer" (él) :',o:['comió','comía','ha comido','comerá'],a:0},
+  {t:'Futur',q:'Futur de "hablar" (yo) :',o:['hablo','hablé','hablaré','hablaría'],a:2},
+  {t:'Futur',q:'Comment exprimer le futur proche ?',o:['voy a + inf.','he + inf.','voy + inf.','fui a + inf.'],a:0},
+  {t:'Expressions',q:'"Tener hambre" signifie :',o:['avoir soif','avoir faim','avoir peur','avoir chaud'],a:1},
+  {t:'Expressions',q:'"Tener razón" signifie :',o:['avoir tort','avoir raison','avoir sommeil','avoir de la chance'],a:1},
+  {t:'Expressions',q:'"Hacer falta" signifie :',o:['faire du mal','avoir chaud','il manque / il faut','faire du bien'],a:2},
+  {t:'Négatif',q:'Comment forme-t-on la négation en espagnol ?',o:['ne ... pas','no + verbe','non + verbe','pas + verbe'],a:1},
+  {t:'Négatif',q:'"No entiendo" signifie :',o:['Je ne parle pas','Je ne comprends pas','Je ne sais pas','Je ne veux pas'],a:1},
+  {t:'Famille',q:'"El hermano" signifie :',o:['le père','la mère','le frère','la sœur'],a:2},
+  {t:'Famille',q:'"Los abuelos" signifie :',o:['les parents','les oncles','les cousins','les grands-parents'],a:3},
+];
+
+let QS={i:0,res:[]};
+function buildQCM(){QS={i:0,res:[]};renderQ();}
+function renderQ(){
+  const el=document.getElementById('sec-qcm');
+  if(QS.i>=QD.length){
+    const ok=QS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=QD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${QD.length}</h2><p>${ok>=QD.length*.8?'¡Excelente!':'¡Sigue practicando!'}</p><button class="btn btn-primary" onclick="buildQCM()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=QD[QS.i];
+  el.innerHTML=`<div class="dots">${dots(QD,QS.i,QS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${QS.i+1} / ${QD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansQ(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="qfb"></div>
+    <div class="nav" id="qnav"></div>
+  </div>`;
+}
+function ansQ(i){
+  const d=QD[QS.i];
+  document.querySelectorAll('#sec-qcm .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-qcm .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('qfb');
+  fb.textContent=ok?'✓ ¡Correcto!':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);QS.res[QS.i]=ok;
+  document.getElementById('qnav').innerHTML=`<button class="btn btn-primary" onclick="QS.i++;renderQ()">${QS.i+1<QD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════ CONJUGAISON ════════ */
+const CONJD=[
+  {t:'Ser – Présent',q:'Complète : Yo ___ estudiante.',b:['soy'],h:'1ère pers. sing. de SER'},
+  {t:'Ser – Présent',q:'Complète : Ella ___ mi amiga.',b:['es'],h:'3ème pers. sing. de SER'},
+  {t:'Ser – Présent',q:'Complète : Nosotros ___ profesores.',b:['somos'],h:'1ère pers. plur. de SER'},
+  {t:'Estar – Présent',q:'Complète : Yo ___ bien.',b:['estoy'],h:'1ère pers. sing. de ESTAR'},
+  {t:'Estar – Présent',q:'Complète : ¿Dónde ___ tú?',b:['estás'],h:'2ème pers. sing. de ESTAR'},
+  {t:'Estar – Présent',q:'Complète : Ellos ___ en casa.',b:['están'],h:'3ème pers. plur. de ESTAR'},
+  {t:'Hablar – Présent',q:'Complète : Yo ___ español.',b:['hablo'],h:'1ère pers. sing. -AR'},
+  {t:'Hablar – Présent',q:'Complète : Ella ___ muy bien.',b:['habla'],h:'3ème pers. sing. -AR'},
+  {t:'Comer – Présent',q:'Complète : Nosotros ___ a las dos.',b:['comemos'],h:'1ère pers. plur. -ER'},
+  {t:'Vivir – Présent',q:'Complète : ¿Dónde ___ tú?',b:['vives'],h:'2ème pers. sing. -IR'},
+  {t:'Tener – Présent',q:'Complète : Yo ___ dos hermanos.',b:['tengo'],h:'Irrégulier yo'},
+  {t:'Ir – Présent',q:'Complète : Yo ___ al mercado.',b:['voy'],h:'Irrégulier yo'},
+  {t:'Querer – Présent',q:'Complète : Él ___ agua.',b:['quiere'],h:'Diphtongue e→ie'},
+  {t:'Poder – Présent',q:'Complète : ¿___ tú ayudarme?',b:['Puedes'],h:'Diphtongue o→ue'},
+  {t:'Pretérito Perfecto',q:'Complète : Yo ___ (hablar) con ella.',b:['he hablado'],h:'he + participe passé'},
+  {t:'Pretérito Perfecto',q:'Complète : Ella ___ (comer) ya.',b:['ha comido'],h:'ha + participe passé'},
+  {t:'Pretérito Indefinido',q:'Complète : Ayer yo ___ (hablar) con él.',b:['hablé'],h:'Passé simple -AR yo'},
+  {t:'Pretérito Indefinido',q:'Complète : Él ___ (ir) a Madrid.',b:['fue'],h:'Irrégulier: ir=fue'},
+  {t:'Futur Simple',q:'Complète : Mañana yo ___ (hablar).',b:['hablaré'],h:'Futur -AR yo'},
+  {t:'Futur Proche',q:'Complète : Voy ___ estudiar esta tarde.',b:['a'],h:'ir a + infinitif'},
+  {t:'Impératif',q:'Complète : ___ (hablar, tú) más despacio.',b:['Habla'],h:'Impératif tú -AR'},
+  {t:'Réfléchi',q:'Complète : Yo me ___ (llamar) Diallo.',b:['llamo'],h:'Verbe réfléchi'},
+];
+
+let CONJS={i:0,res:[]};
+function buildConj(){CONJS={i:0,res:[]};renderConj();}
+function renderConj(){
+  const el=document.getElementById('sec-conj');
+  if(CONJS.i>=CONJD.length){
+    const ok=CONJS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=CONJD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${CONJD.length}</h2><p>${ok>=CONJD.length*.8?'¡Perfecto!':'Sigue practicando !'}</p><button class="btn btn-primary" onclick="buildConj()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=CONJD[CONJS.i];
+  el.innerHTML=`<div class="dots">${dots(CONJD,CONJS.i,CONJS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${CONJS.i+1} / ${CONJD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    <input class="fill-in" id="ci0" placeholder="..." />
+    <div style="margin-top:10px"><button class="btn" onclick="checkConj()" id="cbtn">Vérifier</button></div>
+    <div class="fb" id="cfb"></div>
+    <div class="nav" id="cnav"></div>
+  </div>`;
+}
+function checkConj(){
+  const d=CONJD[CONJS.i];
+  const inp=document.getElementById('ci0');
+  const ok=inp.value.trim().toLowerCase()===d.b[0].toLowerCase();
+  inp.style.borderColor=ok?'var(--green-bd)':'var(--red-bd)';
+  inp.style.color=ok?'var(--green-tx)':'var(--red-tx)';
+  const fb=document.getElementById('cfb');
+  fb.textContent=ok?'✓ ¡Correcto!':'✗ Réponse : '+d.b[0];
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);CONJS.res[CONJS.i]=ok;
+  document.getElementById('cbtn').disabled=true;
+  document.getElementById('cnav').innerHTML=`<button class="btn btn-primary" onclick="CONJS.i++;renderConj()">${CONJS.i+1<CONJD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════ LACUNES ════════ */
+const LD=[
+  {t:'Ser/Estar',s:'Yo ___ de Senegal.',b:['soy'],h:'Origine → SER'},
+  {t:'Ser/Estar',s:'¿___ tú cansado?',b:['Estás'],h:'État temporaire → ESTAR'},
+  {t:'Ser/Estar',s:'Ella ___ doctora.',b:['es'],h:'Profession → SER'},
+  {t:'Ser/Estar',s:'Nosotros ___ en la ciudad.',b:['estamos'],h:'Lieu → ESTAR'},
+  {t:'Présent',s:'Él ___ (trabajar) mucho.',b:['trabaja'],h:'3ème sing. -AR'},
+  {t:'Présent',s:'Yo ___ (tener) hambre.',b:['tengo'],h:'Irrégulier yo'},
+  {t:'Présent',s:'¿___ (poder) tú hablar más despacio?',b:['Puedes'],h:'Diphtongue o→ue'},
+  {t:'Articles',s:'___ casa es grande.',b:['La'],h:'Féminin singulier'},
+  {t:'Articles',s:'Tengo ___ hermano.',b:['un'],h:'Indéfini masculin'},
+  {t:'Négation',s:'No ___ español.',b:['hablo'],h:'Négation + verbe'},
+  {t:'Négation',s:'Ella no ___ (querer) café.',b:['quiere'],h:'3ème sing. querer'},
+  {t:'Questions',s:'¿___ te llamas?',b:['Cómo'],h:'Comment t\'appelles-tu'},
+  {t:'Questions',s:'¿___ años tienes?',b:['Cuántos'],h:'Quel âge as-tu'},
+  {t:'Questions',s:'¿___ vives?',b:['Dónde'],h:'Où habites-tu'},
+  {t:'Expressions',s:'Tengo ___ (faim).',b:['hambre'],h:'Tener hambre'},
+  {t:'Expressions',s:'Hace ___ (chaud).',b:['calor'],h:'Hacer calor'},
+  {t:'Passé',s:'Ayer yo ___ (comer) arroz.',b:['comí'],h:'Passé simple yo -ER'},
+  {t:'Passé',s:'Ella ___ (ir) al mercado.',b:['fue'],h:'Irrégulier ir'},
+  {t:'Futur',s:'Mañana ___ (llover).',b:['lloverá'],h:'Futur impersonnel'},
+  {t:'Futur',s:'Voy ___ estudiar esta noche.',b:['a'],h:'ir a + inf.'},
+];
+
+let LS={i:0,res:[]};
+function buildLac(){LS={i:0,res:[]};renderL();}
+function renderL(){
+  const el=document.getElementById('sec-lac');
+  if(LS.i>=LD.length){
+    const ok=LS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=LD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${LD.length}</h2><p>${ok>=LD.length*.8?'¡Excelente!':'¡Sigue!'}</p><button class="btn btn-primary" onclick="buildLac()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=LD[LS.i];
+  el.innerHTML=`<div class="dots">${dots(LD,LS.i,LS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${LS.i+1} / ${LD.length}</div>
+    <div class="question">${esc(d.s)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    <input class="fill-in" id="li0" placeholder="..." />
+    <div style="margin-top:10px"><button class="btn" onclick="checkL()" id="lbtn">Vérifier</button></div>
+    <div class="fb" id="lfb"></div>
+    <div class="nav" id="lnav"></div>
+  </div>`;
+}
+function checkL(){
+  const d=LD[LS.i];
+  const inp=document.getElementById('li0');
+  const ok=inp.value.trim().toLowerCase()===d.b[0].toLowerCase();
+  inp.style.borderColor=ok?'var(--green-bd)':'var(--red-bd)';
+  inp.style.color=ok?'var(--green-tx)':'var(--red-tx)';
+  const fb=document.getElementById('lfb');
+  fb.textContent=ok?'✓ ¡Correcto!':'✗ Réponse : '+d.b[0];
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);LS.res[LS.i]=ok;
+  document.getElementById('lbtn').disabled=true;
+  document.getElementById('lnav').innerHTML=`<button class="btn btn-primary" onclick="LS.i++;renderL()">${LS.i+1<LD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════ ASSOCIATION ════════ */
+const AD=[
+  {t:'Salutations',p:[['Hola','Salut / Bonjour'],['Adiós','Au revoir'],['Gracias','Merci'],['Por favor','S\'il vous plaît']]},
+  {t:'Famille',p:[['El padre','Le père'],['La madre','La mère'],['El hermano','Le frère'],['La hermana','La sœur']]},
+  {t:'Ser vs Estar',p:[['Soy médico','Je suis médecin (profession)'],['Estoy cansado','Je suis fatigué (état)'],['Es inteligente','Il est intelligent (caractère)'],['Está en casa','Il est à la maison (lieu)']]},
+  {t:'Verbes irréguliers',p:[['Ir → yo','Voy'],['Tener → yo','Tengo'],['Hacer → yo','Hago'],['Decir → yo','Digo']]},
+  {t:'Expressions avec Tener',p:[['Tener hambre','Avoir faim'],['Tener sed','Avoir soif'],['Tener miedo','Avoir peur'],['Tener sueño','Avoir sommeil']]},
+  {t:'Vocabulaire quotidien',p:[['La comida','La nourriture'],['El trabajo','Le travail'],['La casa','La maison'],['El tiempo','Le temps / la météo']]},
+  {t:'Jours de la semaine',p:[['Lunes','Lundi'],['Miércoles','Mercredi'],['Viernes','Vendredi'],['Domingo','Dimanche']]},
+  {t:'Mois',p:[['Enero','Janvier'],['Abril','Avril'],['Agosto','Août'],['Diciembre','Décembre']]},
+  {t:'Questions',p:[['¿Qué?','Quoi ?'],['¿Dónde?','Où ?'],['¿Cuándo?','Quand ?'],['¿Por qué?','Pourquoi ?']]},
+  {t:'Couleurs',p:[['Rojo','Rouge'],['Azul','Bleu'],['Verde','Vert'],['Amarillo','Jaune']]},
+];
+
+let AS={i:0,selL:null,selR:null,matched:[],res:[]};
+function buildAsso(){AS={i:0,selL:null,selR:null,matched:[],res:[]};renderA();}
+function renderA(){
+  const el=document.getElementById('sec-asso');
+  if(AS.i>=AD.length){el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>¡Terminado!</h2><p>Tous les groupes complétés.</p><button class="btn btn-primary" onclick="buildAsso()">🔄 Recommencer</button></div>`;return;}
+  const d=AD[AS.i];
+  const sr=[...d.p.map(p=>p[1])].sort(()=>Math.random()-.5);
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · ${AS.i+1} / ${AD.length}</div>
+    <div class="question">Relie chaque mot à sa traduction.</div>
+    <div class="match-cols" id="ml">${d.p.map((p,i)=>`<button class="m-item" id="ml${i}" onclick="selM('l',${i},'${p[0].replace(/'/g,"\\'")}')">${esc(p[0])}</button>`).join('')}</div>
+    <div style="height:10px"></div>
+    <div class="match-cols" id="mr">${sr.map((r,i)=>`<button class="m-item" id="mr${i}" onclick="selM('r',${i},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('')}</div>
+    <div class="fb" id="afb"></div>
+  </div>`;
+  AS.matched=[];AS.selL=null;AS.selR=null;
+}
+function selM(side,idx,val){
+  if(side==='l'){document.querySelectorAll('#ml .m-item').forEach(b=>b.classList.remove('sel'));document.getElementById('ml'+idx).classList.add('sel');AS.selL={idx,val};}
+  else{document.querySelectorAll('#mr .m-item').forEach(b=>b.classList.remove('sel'));document.getElementById('mr'+idx).classList.add('sel');AS.selR={idx,val};}
+  if(AS.selL&&AS.selR){
+    const d=AD[AS.i];
+    const pair=d.p.find(p=>p[0]===AS.selL.val);
+    const ok=pair&&pair[1]===AS.selR.val;
+    const lel=document.querySelector('#ml .sel');
+    const rel=document.querySelector('#mr .sel');
+    if(ok){
+      if(lel)lel.classList.replace('sel','m-ok');
+      if(rel)rel.classList.replace('sel','m-ok');
+      AS.matched.push(AS.selL.val);score(true);
+      if(AS.matched.length===d.p.length){setTimeout(()=>{AS.i++;renderA();},600);}
+    } else {
+      if(lel){lel.classList.add('m-ko');setTimeout(()=>lel.classList.remove('sel','m-ko'),500);}
+      if(rel){rel.classList.add('m-ko');setTimeout(()=>rel.classList.remove('sel','m-ko'),500);}
+      score(false);
+    }
+    AS.selL=null;AS.selR=null;
+  }
+}
+
+/* ════════ VOCABULAIRE ════════ */
+const VOCD=[
+  {t:'Corps humain',q:'"La cabeza" signifie :',o:['Le bras','La tête','Le pied','La main'],a:1},
+  {t:'Corps humain',q:'"El corazón" signifie :',o:['Le poumon','Le foie','Le cœur','L\'estomac'],a:2},
+  {t:'Nourriture',q:'"El arroz" signifie :',o:['Le pain','Le riz','La viande','Le poisson'],a:1},
+  {t:'Nourriture',q:'"La fruta" signifie :',o:['Le légume','La farine','Le fruit','La boisson'],a:2},
+  {t:'Transports',q:'"El avión" signifie :',o:['Le train','Le bus','L\'avion','Le bateau'],a:2},
+  {t:'Transports',q:'"A pie" signifie :',o:['En voiture','En bus','À pied','En taxi'],a:2},
+  {t:'Météo',q:'"Llueve" signifie :',o:['Il neige','Il fait soleil','Il pleut','Il vente'],a:2},
+  {t:'Météo',q:'"Hace frío" signifie :',o:['Il fait chaud','Il fait beau','Il fait froid','Il fait nuageux'],a:2},
+  {t:'Émotions',q:'"Estoy contento" signifie :',o:['Je suis triste','Je suis en colère','Je suis content','Je suis surpris'],a:2},
+  {t:'Émotions',q:'"Tengo miedo" signifie :',o:['J\'ai mal','J\'ai peur','J\'ai honte','J\'ai faim'],a:1},
+  {t:'Travail',q:'"El jefe" signifie :',o:['L\'employé','Le collègue','Le patron','Le client'],a:2},
+  {t:'Travail',q:'"La reunión" signifie :',o:['La pause','La réunion','Le bureau','Le contrat'],a:1},
+  {t:'Ville',q:'"La calle" signifie :',o:['La place','Le parc','La rue','L\'avenue'],a:2},
+  {t:'Ville',q:'"El mercado" signifie :',o:['Le supermarché','Le marché','La boutique','Le centre commercial'],a:1},
+  {t:'Temps',q:'"A veces" signifie :',o:['toujours','jamais','parfois','souvent'],a:2},
+  {t:'Temps',q:'"Siempre" signifie :',o:['parfois','jamais','rarement','toujours'],a:3},
+  {t:'Quantité',q:'"Mucho" signifie :',o:['peu','assez','beaucoup','trop'],a:2},
+  {t:'Quantité',q:'"Poco" signifie :',o:['beaucoup','un peu','trop','assez'],a:1},
+  {t:'Adjectifs',q:'"Grande" signifie :',o:['petit','nouveau','grand','vieux'],a:2},
+  {t:'Adjectifs',q:'"Barato" signifie :',o:['cher','gratuit','bon marché','coûteux'],a:2},
+];
+
+let VS={i:0,res:[]};
+function buildVoc(){VS={i:0,res:[]};renderVoc();}
+function renderVoc(){
+  const el=document.getElementById('sec-voc');
+  if(VS.i>=VOCD.length){
+    const ok=VS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=VOCD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${VOCD.length}</h2><p>${ok>=VOCD.length*.8?'¡Vocabulario dominado!':'¡Sigue aprendiendo!'}</p><button class="btn btn-primary" onclick="buildVoc()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=VOCD[VS.i];
+  el.innerHTML=`<div class="dots">${dots(VOCD,VS.i,VS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${VS.i+1} / ${VOCD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansVoc(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="vfb"></div>
+    <div class="nav" id="vnav"></div>
+  </div>`;
+}
+function ansVoc(i){
+  const d=VOCD[VS.i];
+  document.querySelectorAll('#sec-voc .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-voc .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('vfb');
+  fb.textContent=ok?'✓ ¡Correcto!':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);VS.res[VS.i]=ok;
+  document.getElementById('vnav').innerHTML=`<button class="btn btn-primary" onclick="VS.i++;renderVoc()">${VS.i+1<VOCD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════ TRADUCTION ════════ */
+const TD=[
+  {t:'Salutations',fr:'Bonjour, comment vas-tu ?',es:'Hola, ¿cómo estás?'},
+  {t:'Présentation',fr:'Je m\'appelle Diallo.',es:'Me llamo Diallo.'},
+  {t:'Présentation',fr:'J\'ai vingt-cinq ans.',es:'Tengo veinticinco años.'},
+  {t:'Ser/Estar',fr:'Je suis sénégalais.',es:'Soy senegalés.'},
+  {t:'Ser/Estar',fr:'Je suis fatigué aujourd\'hui.',es:'Estoy cansado hoy.'},
+  {t:'Présent',fr:'Il parle très bien espagnol.',es:'Habla muy bien español.'},
+  {t:'Présent',fr:'Nous mangeons à midi.',es:'Comemos al mediodía.'},
+  {t:'Négation',fr:'Je ne comprends pas.',es:'No entiendo.'},
+  {t:'Négation',fr:'Elle ne parle pas anglais.',es:'Ella no habla inglés.'},
+  {t:'Questions',fr:'Où est la gare ?',es:'¿Dónde está la estación?'},
+  {t:'Questions',fr:'Combien ça coûte ?',es:'¿Cuánto cuesta?'},
+  {t:'Expressions',fr:'J\'ai faim.',es:'Tengo hambre.'},
+  {t:'Expressions',fr:'Il fait très chaud ici.',es:'Hace mucho calor aquí.'},
+  {t:'Passé',fr:'Hier, j\'ai mangé du riz.',es:'Ayer, comí arroz.'},
+  {t:'Passé',fr:'Elle est allée au marché.',es:'Ella fue al mercado.'},
+  {t:'Futur',fr:'Demain, je vais étudier.',es:'Mañana voy a estudiar.'},
+  {t:'Futur',fr:'Il parlera espagnol bientôt.',es:'Hablará español pronto.'},
+  {t:'Famille',fr:'Mon frère s\'appelle Abdou.',es:'Mi hermano se llama Abdou.'},
+  {t:'Quotidien',fr:'Je travaille tous les jours.',es:'Trabajo todos los días.'},
+  {t:'Quotidien',fr:'Pouvez-vous parler plus lentement ?',es:'¿Puede hablar más despacio?'},
+];
+
+let TS={i:0,res:[]};
+function buildTrad(){TS={i:0,res:[]};renderT();}
+function renderT(){
+  const el=document.getElementById('sec-trad');
+  if(TS.i>=TD.length){
+    const ok=TS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=TD.length*.7?'🏆':'📚'}</div><h2>${ok} / ${TD.length}</h2><p>${ok>=TD.length*.7?'¡Muy bien!':'Revois tes cours !'}</p><button class="btn btn-primary" onclick="buildTrad()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=TD[TS.i];
+  el.innerHTML=`<div class="dots">${dots(TD,TS.i,TS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${TS.i+1} / ${TD.length}</div>
+    <div class="question">Traduis en espagnol :<br><em>${esc(d.fr)}</em></div>
+    <textarea class="fill-in" id="tin" rows="2" placeholder="Tu traducción..."></textarea>
+    <button class="btn" id="tbtn" onclick="checkT()">Vérifier</button>
+    <div class="fb" id="tfb"></div>
+    <div class="nav" id="tnav"></div>
+  </div>`;
+}
+function checkT(){
+  const d=TD[TS.i];
+  const val=document.getElementById('tin').value.trim().toLowerCase();
+  const exp=d.es.toLowerCase();
+  const words=exp.split(/\s+/);
+  const uwords=val.split(/\s+/).map(w=>w.replace(/[?.!,¿¡]/g,''));
+  const matches=words.filter(w=>uwords.includes(w.replace(/[?.!,¿¡]/g,''))).length;
+  const ok=matches>=Math.floor(words.length*0.65);
+  const fb=document.getElementById('tfb');
+  fb.innerHTML='Réponse attendue : <strong>'+esc(d.es)+'</strong><br>'+(ok?'✓ ¡Muy bien!':'✗ Regardez la correction.');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);TS.res[TS.i]=ok;
+  document.getElementById('tbtn').disabled=true;
+  document.getElementById('tin').disabled=true;
+  document.getElementById('tnav').innerHTML=`<button class="btn btn-primary" onclick="TS.i++;renderT()">${TS.i+1<TD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════ DIALOGUE ════════ */
+const DD=[
+  {t:'Présentation',bank:['llamo','años','trabajo','encantado','soy'],
+   lines:[
+    {sp:'DIALLO',txt:"Hola, me ___ Diallo.",key:'llamo'},
+    {sp:'BEN',txt:"¡Hola! Yo ___ Ben.",key:'soy'},
+    {sp:'BEN',txt:"¡Mucho gusto! ___ de conocerte.",key:'encantado'},
+    {sp:'DIALLO',txt:"¿Cuántos ___ tienes?",key:'años'},
+    {sp:'BEN',txt:"Tengo 28. ¿Y tú? ¿A qué te ___?",key:'trabajo'},
+  ]},
+  {t:'Au marché',bank:['cuesta','quiero','tiene','favor','gracias'],
+   lines:[
+    {sp:'DIALLO',txt:"Buenos días. ¿___ mangos?",key:'tiene'},
+    {sp:'VENDEDOR',txt:"Sí, aquí están.",key:null},
+    {sp:'DIALLO',txt:"¿Cuánto ___ el kilo?",key:'cuesta'},
+    {sp:'DIALLO',txt:"___ un kilo, por favor.",key:'quiero'},
+    {sp:'VENDEDOR',txt:"Aquí tiene. ¡___!",key:'gracias'},
+  ]},
+  {t:'Demander son chemin',bank:['está','siga','doble','cerca','perdón'],
+   lines:[
+    {sp:'DIALLO',txt:"___, ¿dónde está la estación?",key:'perdón'},
+    {sp:'SEÑORA',txt:"___ todo recto.",key:'siga'},
+    {sp:'SEÑORA',txt:"Luego ___ a la derecha.",key:'doble'},
+    {sp:'DIALLO',txt:"¿Está ___ de aquí?",key:'cerca'},
+    {sp:'SEÑORA',txt:"Sí, ___ a cinco minutos.",key:'está'},
+  ]},
+  {t:'Au restaurant',bank:['carta','quiere','recomienda','cuenta','mesa'],
+   lines:[
+    {sp:'CAMARERO',txt:"Buenas noches. ¿Tiene reserva?",key:null},
+    {sp:'DIALLO',txt:"No, pero ¿hay ___?",key:'mesa'},
+    {sp:'CAMARERO',txt:"Sí, aquí tiene la ___.",key:'carta'},
+    {sp:'DIALLO',txt:"¿Qué nos ___?",key:'recomienda'},
+    {sp:'DIALLO',txt:"La ___, por favor.",key:'cuenta'},
+  ]},
+];
+
+let DIAGS={i:0,sel:null,filled:{},res:[]};
+function buildDiag(){DIAGS={i:0,sel:null,filled:{},res:[]};renderDiag();}
+function renderDiag(){
+  const el=document.getElementById('sec-diag');
+  if(DIAGS.i>=DD.length){el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>¡Diálogos terminados!</h2><p>¡Muy bien!</p><button class="btn btn-primary" onclick="buildDiag()">🔄 Recommencer</button></div>`;return;}
+  const d=DD[DIAGS.i];
+  const chips=d.bank.map((w,wi)=>`<button class="chip" id="ch${wi}" onclick="pickChip('${w.replace(/'/g,"\\'")}',${wi})">${esc(w)}</button>`).join('');
+  const lines=d.lines.map((l,li)=>{
+    if(!l.key)return`<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${esc(l.txt)}</div>`;
+    return`<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${l.txt.replace('___',`<span class="blank" id="bl${li}" onclick="fillBlank(${li})">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`)}</div>`;
+  }).join('');
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · Diálogo ${DIAGS.i+1} / ${DD.length}</div>
+    <div class="question">👆 Sélectionne un mot puis tape sur un blanc.</div>
+    <div class="bank">${chips}</div>
+    <div>${lines}</div>
+    <div style="margin-top:14px"><button class="btn" id="dbtn" onclick="checkDiag()">Vérifier</button></div>
+    <div class="fb" id="diafb"></div>
+    <div class="nav" id="dianav"></div>
+  </div>`;
+  DIAGS.sel=null;DIAGS.filled={};
+}
+function pickChip(word,wi){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+  document.getElementById('ch'+wi).classList.add('sel-chip');
+  DIAGS.sel={word,wi};
+}
+function fillBlank(li){
+  if(!DIAGS.sel)return;
+  const b=document.getElementById('bl'+li);
+  if(DIAGS.filled[li]){
+    const old=document.getElementById('ch'+DIAGS.filled[li].wi);
+    if(old)old.classList.remove('used');
+  }
+  DIAGS.filled[li]=DIAGS.sel;
+  b.textContent=DIAGS.sel.word;
+  document.getElementById('ch'+DIAGS.sel.wi).classList.add('used');
+  document.getElementById('ch'+DIAGS.sel.wi).classList.remove('sel-chip');
+  DIAGS.sel=null;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+}
+function checkDiag(){
+  const d=DD[DIAGS.i];let ok=0,tot=0;
+  d.lines.forEach((l,li)=>{
+    if(!l.key)return;tot++;
+    const b=document.getElementById('bl'+li);
+    if(DIAGS.filled[li]&&DIAGS.filled[li].word.toLowerCase()===l.key.toLowerCase()){b.classList.add('b-ok');ok++;}
+    else{b.classList.add('b-ko');b.textContent=l.key;}
+  });
+  const allOk=ok===tot;
+  score(allOk);DIAGS.res[DIAGS.i]=allOk;
+  const fb=document.getElementById('diafb');
+  fb.textContent=allOk?'✓ ¡Perfecto!':'✗ '+ok+'/'+tot+' — Corrections en vert.';
+  fb.className='fb '+(allOk?'ok':'ko');
+  document.getElementById('dbtn').disabled=true;
+  document.getElementById('dianav').innerHTML=`<button class="btn btn-primary" onclick="DIAGS.i++;renderDiag()">${DIAGS.i+1<DD.length?'Dialogue suivant →':'Résultat →'}</button>`;
+}
+
+/* INIT */
+buildQCM();buildConj();buildLac();buildAsso();buildVoc();buildTrad();buildDiag();
+</script>
+</body>
+</html>
