@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CTI Anglais">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a4a8a">
+<title>CTI — Anglais Hors Ligne</title>
+
+<!-- Inline Manifest via JS (for single-file PWA) -->
+<script>
+// Register inline service worker for offline
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'cti-anglais-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(
+        caches.open(CACHE).then(cache =>
+          cache.addAll([self.location.href])
+        )
+      );
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request)))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// Inject Web App Manifest
+const manifest = {
+  name: "CTI — Cahier Anglais",
+  short_name: "CTI Anglais",
+  description: "Cahier de révision anglais CTI — hors ligne",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#1a4a8a",
+  theme_color: "#1a4a8a",
+  orientation: "portrait-primary",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231a4a8a'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='%23d4a840' font-family='serif'%3E🇬🇧%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a4a8a'/%3E%3Ctext x='256' y='340' font-size='260' text-anchor='middle' fill='%23d4a840' font-family='serif'%3E🇬🇧%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+const mUrl = URL.createObjectURL(mBlob);
+const mLink = document.createElement('link');
+mLink.rel = 'manifest';
+mLink.href = mUrl;
+document.head.appendChild(mLink);
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f6; --bg2: #f0ede6; --bg3: #e8e4db;
+  --text: #1c1a14; --text2: #6b6860; --text3: #9a9890;
+  --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
+  --accent: #1a4a8a; --gold: #d4a840;
+  --green-bg: #e8f5d8; --green-bd: #4a8a1a; --green-tx: #2d5a0e;
+  --red-bg: #fdeaea; --red-bd: #8a1a1a; --red-tx: #5a0e0e;
+  --blue-bg: #e0ecfa; --blue-tx: #1a4a8a;
+  --radius: 14px; --radius-sm: 10px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16140f; --bg2: #201e17; --bg3: #2a2720;
+    --text: #f0ece2; --text2: #a8a49a; --text3: #706e66;
+    --border: rgba(255,255,255,0.10); --border2: rgba(255,255,255,0.18);
+    --green-bg: #0e2a04; --green-bd: #2d5a0e; --green-tx: #a8d878;
+    --red-bg: #2a0808; --red-bd: #5a0e0e; --red-tx: #e88888;
+    --blue-bg: #081830; --blue-tx: #6898d8;
+  }
+}
+
+html { height: 100%; }
+body {
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg3); color: var(--text);
+  min-height: 100%; overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── TOP HEADER BAR ── */
+.top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--accent);
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.top-bar .logo-sm {
+  background: var(--gold); color: #111;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px; border-radius: 4px;
+  letter-spacing: 0.08em; white-space: nowrap;
+}
+.top-bar h1 { color: #fff; font-size: 15px; font-weight: 600; flex: 1; }
+.score-pill {
+  background: rgba(255,255,255,0.18); color: #fff;
+  font-size: 13px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+}
+
+/* ── PROGRESS BAR ── */
+.prog-bar { height: 3px; background: rgba(255,255,255,0.2); }
+.prog-fill { height: 100%; background: var(--gold); transition: width 0.4s ease; width: 0%; }
+
+/* ── INSTALL BANNER ── */
+.install-banner {
+  display: none; margin: 12px 14px 0;
+  background: var(--blue-bg); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 13px; color: var(--blue-tx); line-height: 1.5;
+  align-items: center; gap: 10px;
+}
+.install-banner.show { display: flex; }
+.install-banner .ib-text { flex: 1; }
+.install-banner button {
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  padding: 6px 12px; cursor: pointer; white-space: nowrap;
+}
+
+/* ── TABS ── */
+.tabs-wrap {
+  overflow-x: auto; padding: 12px 14px 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.tabs { display: flex; gap: 7px; min-width: max-content; }
+.tab {
+  padding: 8px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border2); font-size: 13px;
+  cursor: pointer; background: var(--bg); color: var(--text2);
+  font-weight: 500; white-space: nowrap;
+  -webkit-user-select: none; transition: all 0.15s;
+}
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── CONTENT ── */
+.content { padding: 12px 14px calc(var(--safe-bot) + 60px); }
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  margin-bottom: 12px;
+}
+.card-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--text3); text-transform: uppercase; margin-bottom: 8px; display: block;
+}
+.question { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+.question em { font-style: italic; color: var(--text2); }
+
+/* ── DOTS ── */
+.dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+.dot.ok { background: var(--green-bd); }
+.dot.ko { background: var(--red-bd); }
+.dot.cur { background: var(--accent); }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 9px; }
+.option {
+  padding: 13px 15px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 15px;
+  color: var(--text); background: transparent;
+  text-align: left; line-height: 1.4; cursor: pointer;
+  -webkit-user-select: none; transition: background 0.1s;
+  font-family: inherit;
+}
+.option:active:not(.locked) { background: var(--bg2); }
+.option.correct { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+.option.wrong { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+.option.reveal { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+
+/* ── FEEDBACK ── */
+.fb {
+  margin-top: 10px; padding: 11px 14px;
+  border-radius: var(--radius-sm); font-size: 14px;
+  display: none; line-height: 1.5;
+}
+.fb.ok { background: var(--green-bg); color: var(--green-tx); display: block; border-left: 3px solid var(--green-bd); }
+.fb.ko { background: var(--red-bg); color: var(--red-tx); display: block; border-left: 3px solid var(--red-bd); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 11px 20px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 14px;
+  cursor: pointer; background: transparent; color: var(--text);
+  font-family: inherit; font-weight: 500;
+  -webkit-user-select: none;
+}
+.btn:active { opacity: 0.75; }
+.btn:disabled { opacity: 0.35; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nav { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+/* ── INPUTS ── */
+.fill-in {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: inherit; color: var(--text);
+  background: var(--bg2); margin-bottom: 10px; outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+.fill-in:focus { border-color: var(--accent); }
+textarea.fill-in { resize: none; min-height: 72px; }
+.hint {
+  font-size: 12px; color: var(--text3);
+  padding: 6px 10px; background: var(--bg2);
+  border-radius: 8px; display: inline-block; margin-bottom: 10px;
+}
+
+/* ── MATCH ── */
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.m-item {
+  padding: 12px 10px; border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 13px;
+  text-align: center; color: var(--text); background: transparent;
+  cursor: pointer; font-family: inherit; line-height: 1.4;
+  -webkit-user-select: none;
+}
+.m-item:active { background: var(--bg2); }
+.m-item.sel { background: var(--blue-bg); border-color: var(--accent); }
+.m-item.m-ok { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); pointer-events: none; }
+.m-item.m-ko { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+
+/* ── DIALOGUE ── */
+.bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  padding: 8px 16px; border: 1.5px solid var(--border2);
+  border-radius: 20px; font-size: 14px;
+  color: var(--text); background: transparent;
+  cursor: pointer; font-family: inherit;
+  -webkit-user-select: none;
+}
+.chip:active:not(.used) { background: var(--bg2); }
+.chip.sel-chip { border-color: var(--accent); background: var(--blue-bg); color: var(--blue-tx); }
+.chip.used { opacity: 0.28; pointer-events: none; }
+.diag-line { margin: 10px 0; font-size: 15px; line-height: 1.65; }
+.diag-line strong { color: var(--accent); font-weight: 700; }
+.blank {
+  display: inline-block; min-width: 80px; border-bottom: 2px solid var(--border2);
+  margin: 0 4px; text-align: center; padding: 0 6px;
+  color: var(--text); font-size: 15px; cursor: pointer;
+}
+.blank.b-ok { border-bottom-color: var(--green-bd); color: var(--green-tx); }
+.blank.b-ko { border-bottom-color: var(--red-bd); color: var(--red-tx); }
+
+/* ── INFO BOX ── */
+.info-box {
+  background: var(--blue-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 14px;
+  font-size: 13px; color: var(--blue-tx); line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* ── CONGRATS ── */
+.congrats { text-align: center; padding: 2rem 1rem; }
+.congrats .emoji { font-size: 48px; margin-bottom: 8px; }
+.congrats h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.congrats p { color: var(--text2); font-size: 15px; margin-bottom: 20px; }
+
+/* ── OFFLINE INDICATOR ── */
+.offline-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4caf50; display: inline-block; margin-right: 4px;
+}
+.offline-dot.off { background: #f44336; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo-sm">CTI</div>
+  <h1>Anglais <span id="offline-status" style="font-size:11px;opacity:0.7;font-weight:400"></span></h1>
+  <div class="score-pill" id="sv">0 / 0</div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="sf"></div></div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div class="ib-text">📲 <strong>Installer l'appli</strong> pour utiliser hors ligne !</div>
+  <button onclick="doInstall()">Installer</button>
+  <button style="background:transparent;color:var(--blue-tx);border:none;font-size:18px;padding:0 4px;" onclick="document.getElementById('installBanner').classList.remove('show')">×</button>
+</div>
+
+<!-- iOS install hint -->
+<div class="install-banner" id="iosBanner">
+  <div class="ib-text">📲 Sur iPhone : appuye sur <strong>⎙ Partager</strong> → <strong>"Sur l'écran d'accueil"</strong> pour installer hors ligne.</div>
+  <button style="background:transparent;color:var(--blue-tx);border:none;font-size:18px;padding:0 4px;" onclick="document.getElementById('iosBanner').classList.remove('show')">×</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showSec('qcm',this)">📝 QCM</button>
+    <button class="tab" onclick="showSec('conj',this)">🔤 Conjugaison</button>
+    <button class="tab" onclick="showSec('lac',this)">✏️ Lacunes</button>
+    <button class="tab" onclick="showSec('asso',this)">🔗 Association</button>
+    <button class="tab" onclick="showSec('dates',this)">📅 Dates</button>
+    <button class="tab" onclick="showSec('nombres',this)">🔢 Nombres</button>
+    <button class="tab" onclick="showSec('trad',this)">🌍 Traduction</button>
+    <button class="tab" onclick="showSec('diag',this)">💬 Dialogue</button>
+    <button class="tab" onclick="showSec('voc',this)">📖 Vocabulaire</button>
+    <button class="tab" onclick="showSec('modal',this)">⚙️ Modaux</button>
+  </div>
+</div>
+
+<!-- SECTIONS -->
+<div class="content">
+  <div id="sec-qcm" class="section active"></div>
+  <div id="sec-conj" class="section"></div>
+  <div id="sec-lac" class="section"></div>
+  <div id="sec-asso" class="section"></div>
+  <div id="sec-dates" class="section"></div>
+  <div id="sec-nombres" class="section"></div>
+  <div id="sec-trad" class="section"></div>
+  <div id="sec-diag" class="section"></div>
+  <div id="sec-voc" class="section"></div>
+  <div id="sec-modal" class="section"></div>
+</div>
+
+<script>
+'use strict';
+
+/* ── SCORE ── */
+let totOk=0,totAns=0;
+function score(ok){
+  totAns++;if(ok)totOk++;
+  document.getElementById('sv').textContent=totOk+' / '+totAns;
+  const p=totAns?Math.round(totOk/totAns*100):0;
+  document.getElementById('sf').style.width=p+'%';
+}
+function showSec(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo(0,0);
+}
+function dots(data,cur,res){
+  return data.map((_,i)=>{
+    let c='dot';
+    if(i<cur)c+=res[i]?' ok':' ko';
+    else if(i===cur)c+=' cur';
+    return '<div class="'+c+'"></div>';
+  }).join('');
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ── OFFLINE STATUS ── */
+function updateOnline(){
+  const el=document.getElementById('offline-status');
+  if(navigator.onLine){el.textContent='● en ligne';}
+  else{el.textContent='● hors ligne';}
+}
+window.addEventListener('online',updateOnline);
+window.addEventListener('offline',updateOnline);
+updateOnline();
+
+/* ── INSTALL PWA ── */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('installBanner').classList.add('show');
+});
+function doInstall(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;document.getElementById('installBanner').classList.remove('show');}
+}
+// iOS hint
+const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone=window.navigator.standalone===true;
+if(isIos&&!isStandalone){
+  document.getElementById('iosBanner').classList.add('show');
+}
+
+/* ════════════════════════════════════
+   QCM
+════════════════════════════════════ */
+const QD=[
+  {t:'Alphabet',q:'Comment se prononce la lettre H ?',o:['éïch','hache','ki','bi'],a:0},
+  {t:'Alphabet',q:'Combien de lettres dans l\'alphabet anglais ?',o:['24','25','26','27'],a:2},
+  {t:'Alphabet',q:'Comment se prononce G ?',o:['gé','dji','gi','je'],a:1},
+  {t:'Alphabet',q:'Comment se prononce W ?',o:['vi','double v','dabel you','oué'],a:2},
+  {t:'Alphabet',q:'Comment se prononce Y ?',o:['yi','oui','waï','yé'],a:2},
+  {t:'Alphabet',q:'Quelle lettre se prononce "zed" ou "zi" ?',o:['S','X','Z','C'],a:2},
+  {t:'WH Questions',q:'Quelle WH question = "pourquoi" ?',o:['When','Where','Why','Which'],a:2},
+  {t:'WH Questions',q:'WH question pour une personne (sujet) ?',o:['Whom','Whose','Which','Who'],a:3},
+  {t:'WH Questions',q:'"Laquelle des couleurs ?" →',o:['What color?','Which color?','Who color?','Where color?'],a:1},
+  {t:'WH Questions',q:'"Whose" signifie :',o:['qui','où','dont / duquel','quand'],a:2},
+  {t:'WH Questions',q:'"When were you born?" →',o:['Où es-tu né ?','Qui es-tu ?','Quand es-tu né ?','Pourquoi es-tu né ?'],a:2},
+  {t:'WH Questions',q:'"How far is it?" →',o:['C\'est loin ?','C\'est comment ?','C\'est combien ?','Depuis quand ?'],a:0},
+  {t:'To Be',q:'Forme correcte pour "he" ?',o:['He are','He am','He is','He be'],a:2},
+  {t:'To Be',q:'Interro-négatif de "You are" :',o:['Are you not?','You are not?','Is you not?','Not are you?'],a:0},
+  {t:'To Be',q:'"To be late" →',o:['être fatigué','être en retard','être occupé','être libre'],a:1},
+  {t:'To Be',q:'"We are not" →',o:['nous ne sommes pas','nous n\'avons pas','nous ne sommes','vous n\'êtes pas'],a:0},
+  {t:'To Be',q:'"I\'m off" →',o:['Je suis en retard','Je suis fatigué','Je m\'en vais','Je suis libre'],a:2},
+  {t:'To Be',q:'Passé de "they" avec To Be :',o:['they was','they were','they be','they been'],a:1},
+  {t:'To Have',q:'Forme correcte pour "he" :',o:['He have','He had','He has','He haves'],a:2},
+  {t:'To Have',q:'"Don\'t" = ?',o:["Doesn't","Do not","Didn't","Won't"],a:1},
+  {t:'To Have',q:'"To have an impediment" →',o:['avoir une idée','avoir pitié','avoir un empêchement','avoir des mots'],a:2},
+  {t:'To Have',q:'Phrase correcte ?',o:['Do she have time?','Does she have time?','Has she time done?','Is she have time?'],a:1},
+  {t:'Present Simple',q:'On utilise le Present Simple pour :',o:['une action en cours','une habitude','une action future','une action passée récente'],a:1},
+  {t:'Present Simple',q:'Terminaison à la 3ème pers. sing. ?',o:['-ing','-ed','-s / -es','rien'],a:2},
+  {t:'Present Simple',q:'Forme négative correcte :',o:['She not work','She doesn\'t works','She doesn\'t work','She don\'t work'],a:2},
+  {t:'Present Continuous',q:'On forme le Present Continuous avec :',o:['To be + infinitif','To be + verbe-ing','To have + verbe-ing','will + verbe'],a:1},
+  {t:'Present Continuous',q:'Forme interrog. de "She is cooking" :',o:['Is she cooking?','Does she cooking?','She is cooking?','Is she cook?'],a:0},
+  {t:'Past Simple',q:'Passé de "go" ?',o:['goed','gone','went','go'],a:2},
+  {t:'Past Simple',q:'Passé de "see" ?',o:['seed','sawed','seen','saw'],a:3},
+  {t:'Past Simple',q:'Forme négative du passé :',o:['I didn\'t went','I not went','I didn\'t go','I don\'t went'],a:2},
+  {t:'Past Simple',q:'Passé de "buy" ?',o:['buyed','buied','bought','boughted'],a:2},
+  {t:'Future',q:'"Will" sert pour :',o:['une habitude','une décision spontanée','une action en cours','une action passée'],a:1},
+  {t:'Future',q:'"Going to" exprime :',o:['une décision spontanée','un plan prévu','une vérité générale','une action passée'],a:1},
+  {t:'Beaucoup',q:'"Much" s\'utilise avec :',o:['noms dénombrables','noms indénombrables','noms propres','verbes'],a:1},
+  {t:'Beaucoup',q:'Phrase correcte :',o:['She speaks much languages.','She speaks many languages.','She speaks lots language.','She speaks several language.'],a:1},
+  {t:'Idiomes',q:'"To be fed up with" →',o:['avoir faim','en avoir marre de','avoir de la chance','avoir sommeil'],a:1},
+  {t:'Idiomes',q:'"I am thirsty" →',o:['J\'ai faim','J\'ai froid','J\'ai soif','J\'ai sommeil'],a:2},
+  {t:'Idiomes',q:'"To be right" →',o:['avoir tort','être à droite','avoir raison','être correct'],a:2},
+  {t:'Idiomes',q:'"She is ashamed" →',o:['Elle a peur','Elle a honte','Elle a chaud','Elle est malade'],a:1},
+  {t:'Introduction',q:'Comment introduit-on quelqu\'un d\'autre ?',o:['My name is...','I go by...','Let me introduce you to...','Nice to meet you!'],a:2},
+  {t:'Introduction',q:'"Pleased to meet you!" est :',o:['se présenter','répondre à une présentation','introduire quelqu\'un','demander un nom'],a:1},
+  {t:'Vocabulaire',q:'"Afterwards" →',o:['avant','pendant','ensuite','depuis'],a:2},
+  {t:'Vocabulaire',q:'"Traffic jam" →',o:['accident','feu rouge','embouteillage','autoroute'],a:2},
+  {t:'Vocabulaire',q:'"Siblings" →',o:['parents','frères et sœurs','amis','collègues'],a:1},
+  {t:'Vocabulaire',q:'"To afford" →',o:['offrir','avoir les moyens de','acheter','vendre'],a:1},
+  {t:'Vocabulaire',q:'"Heat wave" →',o:['vague de froid','canicule','pluie','chaleur normale'],a:1},
+  {t:'Vocabulaire',q:'"To get scarce" →',o:['devenir célèbre','se faire rare','être pressé','trouver de la place'],a:1},
+];
+
+let QS={i:0,res:[]};
+function buildQCM(){QS={i:0,res:[]};renderQ();}
+function renderQ(){
+  const el=document.getElementById('sec-qcm');
+  if(QS.i>=QD.length){
+    const ok=QS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=QD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${QD.length}</h2><p>${ok>=QD.length*.8?'Excellent travail !':'Continue de t\'entraîner !'}</p><button class="btn btn-primary" onclick="buildQCM()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=QD[QS.i];
+  el.innerHTML=`<div class="dots">${dots(QD,QS.i,QS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${QS.i+1} / ${QD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansQ(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="qfb"></div>
+    <div class="nav" id="qnav"></div>
+  </div>`;
+}
+function ansQ(i){
+  const d=QD[QS.i];
+  document.querySelectorAll('#sec-qcm .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-qcm .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('qfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);QS.res[QS.i]=ok;
+  document.getElementById('qnav').innerHTML=`<button class="btn btn-primary" onclick="QS.i++;renderQ()">${QS.i+1<QD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   CONJUGAISON
+════════════════════════════════════ */
+const CONJD=[
+  {t:'To Be – Présent',q:'I ___ a student.',b:['am'],h:'1ère pers. sing.'},
+  {t:'To Be – Présent',q:'She ___ my sister.',b:['is'],h:'3ème pers. sing.'},
+  {t:'To Be – Présent',q:'We ___ tired.',b:['are'],h:'1ère pers. plur.'},
+  {t:'To Be – Présent',q:'___ they ready?',b:['Are'],h:'Interrogatif'},
+  {t:'To Be – Présent',q:'Contracté de "I am not" :',b:["I'm not"],h:'Contraction'},
+  {t:'To Be – Passé',q:'He ___ not here yesterday.',b:['was'],h:'3ème pers. sing. passé'},
+  {t:'To Be – Passé',q:'They ___ at school.',b:['were'],h:'Pluriel passé'},
+  {t:'To Be – Passé',q:'___ you at home last night?',b:['Were'],h:'Interrogatif passé'},
+  {t:'Present Simple',q:'She ___ (work) every day.',b:['works'],h:'3ème pers. sing. → +s'},
+  {t:'Present Simple',q:'He ___ (go) to school.',b:['goes'],h:'go/do → +es'},
+  {t:'Present Simple',q:'They ___ (not/like) fish. (2 mots)',b:["don't","like"],h:'Nég. pluriel'},
+  {t:'Present Simple',q:'She ___ (study) every day.',b:['studies'],h:'y → ies'},
+  {t:'Present Continuous',q:'He ___ (run) right now. (2 mots)',b:['is','running'],h:'is + V-ing'},
+  {t:'Present Continuous',q:'I ___ (sit) on the chair. (2 mots)',b:['am','sitting'],h:'am + V-ing'},
+  {t:'Present Continuous',q:'___ she ___ (sleep)? (2 mots)',b:['Is','sleeping'],h:'Interrog. continu'},
+  {t:'Past Simple',q:'She ___ (visit) Paris last year.',b:['visited'],h:'Régulier → +ed'},
+  {t:'Past Simple',q:'He ___ (buy) a new car.',b:['bought'],h:'Irrégulier'},
+  {t:'Past Simple',q:'They ___ (not/go) out. (2 mots)',b:["didn't","go"],h:'Nég. passé'},
+  {t:'Past Simple',q:'I ___ (write) a letter. (2 mots)',b:['wrote',''],h:'Irrégulier'},
+  {t:'Future – Will',q:'She ___ (help) you. (2 mots)',b:['will','help'],h:'will + infinitif'},
+  {t:'Future – Will',q:'I ___ (not/go). (2 mots)',b:["won't","go"],h:'Nég. futur'},
+  {t:'Going To',q:'He ___ (go to/travel) next week. (3 mots)',b:['is','going','to travel'],h:'is going to + inf.'},
+  {t:'Modaux',q:'She ___ speak three languages.',b:['can'],h:'Capacité'},
+  {t:'Modaux',q:'You ___ study more.',b:['should'],h:'Conseil'},
+  {t:'Modaux',q:'You ___ not smoke here.',b:['must'],h:'Interdiction'},
+];
+
+let CONJS={i:0,res:[]};
+function buildConj(){CONJS={i:0,res:[]};renderConj();}
+function renderConj(){
+  const el=document.getElementById('sec-conj');
+  if(CONJS.i>=CONJD.length){
+    const ok=CONJS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=CONJD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${CONJD.length}</h2><p>${ok>=CONJD.length*.8?'Maîtrise parfaite !':'Revois les temps !'}</p><button class="btn btn-primary" onclick="buildConj()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=CONJD[CONJS.i];
+  const realBlanks=d.b.filter(b=>b!=='');
+  const ins=realBlanks.map((_,bi)=>`<input class="fill-in" id="ci${bi}" placeholder="..." />`).join('');
+  el.innerHTML=`<div class="dots">${dots(CONJD,CONJS.i,CONJS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${CONJS.i+1} / ${CONJD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    ${ins}
+    <div style="margin-top:10px"><button class="btn" onclick="checkConj()" id="cbtn">Vérifier</button></div>
+    <div class="fb" id="cfb"></div>
+    <div class="nav" id="cnav"></div>
+  </div>`;
+}
+function checkConj(){
+  const d=CONJD[CONJS.i];
+  const realBlanks=d.b.filter(b=>b!=='');
+  let ok=true;
+  realBlanks.forEach((b,bi)=>{
+    const inp=document.getElementById('ci'+bi);
+    if(!inp)return;
+    if(inp.value.trim().toLowerCase()===b.toLowerCase()){
+      inp.style.borderColor='var(--green-bd)';inp.style.color='var(--green-tx)';
+    } else {
+      inp.style.borderColor='var(--red-bd)';inp.style.color='var(--red-tx)';ok=false;
+    }
+  });
+  const fb=document.getElementById('cfb');
+  fb.textContent=ok?'✓ Parfait !':'✗ Réponse(s) : '+realBlanks.join(' | ');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);CONJS.res[CONJS.i]=ok;
+  document.getElementById('cbtn').disabled=true;
+  document.getElementById('cnav').innerHTML=`<button class="btn btn-primary" onclick="CONJS.i++;renderConj()">${CONJS.i+1<CONJD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   LACUNES
+════════════════════════════════════ */
+const LD=[
+  {t:'To Be',s:'___ am not late today.',b:['I'],h:'1ère pers. sing.'},
+  {t:'To Be',s:'She ___ not happy.',b:['is'],h:'To Be / She'},
+  {t:'To Be',s:'___ you busy now?',b:['Are'],h:'Forme interrogative'},
+  {t:'To Be',s:'They ___ not free.',b:['are'],h:'To Be / They'},
+  {t:'To Have',s:'He ___ a lot of friends.',b:['has'],h:'To Have / He'},
+  {t:'To Have',s:'I ___ not ___ a car.',b:['do','have'],h:'Nég. (2 mots)'},
+  {t:'Beaucoup',s:'I can\'t eat ___ rice.',b:['much'],h:'Indénombrable'},
+  {t:'Beaucoup',s:'She speaks ___ languages.',b:['many'],h:'Dénombrable pluriel'},
+  {t:'WH Questions',s:'___ are you with?',b:['Who'],h:'Personne'},
+  {t:'WH Questions',s:'___ is it? (Où)',b:['Where'],h:'Lieu'},
+  {t:'WH Questions',s:'___ were you born?',b:['When'],h:'Temps'},
+  {t:'Present Simple',s:'He ___ (like) chocolate.',b:['likes'],h:'+s 3ème pers.'},
+  {t:'Present Simple',s:'She ___ (not/eat) meat.',b:["doesn't eat"],h:'Nég. 3ème pers.'},
+  {t:'Present Continuous',s:'They ___ (play) football now.',b:['are playing'],h:'are + V-ing'},
+  {t:'Past Simple',s:'He ___ (see) her yesterday.',b:['saw'],h:'Irrégulier'},
+  {t:'Past Simple',s:'We ___ (not/go) out.',b:["didn't go"],h:'Nég. passé'},
+  {t:'Future',s:'She ___ (call) you tomorrow.',b:['will call'],h:'will + inf.'},
+  {t:'Idiomes',s:'I am ___ of waiting.',b:['tired'],h:'To be tired of'},
+  {t:'Idiomes',s:'Are you ___ of pets?',b:['afraid'],h:'To be afraid of'},
+  {t:'Modaux',s:'You ___ see a doctor.',b:['should'],h:'Conseil'},
+  {t:'Modaux',s:'She ___ drive.',b:['can'],h:'Capacité'},
+  {t:'Modaux',s:'You ___ not park here.',b:['must'],h:'Interdiction'},
+  {t:'Dates',s:'Il est né le ___ of January.',b:['1st'],h:'Premier (ordinal)'},
+  {t:'Nombres',s:'15 en anglais = ___',b:['fifteen'],h:'Number in words'},
+];
+
+let LS={i:0,res:[]};
+function buildLac(){LS={i:0,res:[]};renderL();}
+function renderL(){
+  const el=document.getElementById('sec-lac');
+  if(LS.i>=LD.length){
+    const ok=LS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=LD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${LD.length}</h2><p>${ok>=LD.length*.8?'Excellent !':'Continue !'}</p><button class="btn btn-primary" onclick="buildLac()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=LD[LS.i];
+  const ins=d.b.map((_,bi)=>`<input class="fill-in" id="li${bi}" placeholder="..." />`).join('');
+  el.innerHTML=`<div class="dots">${dots(LD,LS.i,LS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${LS.i+1} / ${LD.length}</div>
+    <div class="question">${esc(d.s)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    ${ins}
+    <div style="margin-top:10px"><button class="btn" onclick="checkL()" id="lbtn">Vérifier</button></div>
+    <div class="fb" id="lfb"></div>
+    <div class="nav" id="lnav"></div>
+  </div>`;
+}
+function checkL(){
+  const d=LD[LS.i];let ok=true;
+  d.b.forEach((b,bi)=>{
+    const inp=document.getElementById('li'+bi);
+    if(inp.value.trim().toLowerCase()===b.toLowerCase()){
+      inp.style.borderColor='var(--green-bd)';inp.style.color='var(--green-tx)';
+    } else {
+      inp.style.borderColor='var(--red-bd)';inp.style.color='var(--red-tx)';ok=false;
+    }
+  });
+  const fb=document.getElementById('lfb');
+  fb.textContent=ok?'✓ Parfait !':'✗ Réponse(s) : '+d.b.join(' / ');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);LS.res[LS.i]=ok;
+  document.getElementById('lbtn').disabled=true;
+  document.getElementById('lnav').innerHTML=`<button class="btn btn-primary" onclick="LS.i++;renderL()">${LS.i+1<LD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   ASSOCIATION
+════════════════════════════════════ */
+const AD=[
+  {t:'Idiomes avec To Be',p:[['To be lucky','Avoir de la chance'],['To be sleepy','Avoir sommeil'],['To be in a rush','Être pressé'],['To be fed up with','En avoir marre de']]},
+  {t:'To Have – expressions',p:[['To have mercy','Avoir pitié'],['To have manners','Avoir des manières'],['To have words','Avoir des mots'],['To have knowledge','Avoir des connaissances']]},
+  {t:'Introduction',p:[['Nice to meet you!','Ravi de te rencontrer !'],['Let me introduce you to...','Laisse-moi te présenter...'],['I go by the name of...','Je suis connu sous le nom de...'],['May I present you to...','Puis-je vous présenter...']]},
+  {t:'Jours de la semaine',p:[['Monday','Lundi'],['Wednesday','Mercredi'],['Friday','Vendredi'],['Sunday','Dimanche']]},
+  {t:'Mois de l\'année',p:[['January','Janvier'],['April','Avril'],['August','Août'],['November','Novembre']]},
+  {t:'Famille',p:[['Mother','Mère'],['Brother','Frère'],['Grandmother','Grand-mère'],['Nephew','Neveu']]},
+  {t:'Professions',p:[['Teacher','Enseignant(e)'],['Nurse','Infirmier/ière'],['Lawyer','Avocat(e)'],['Accountant','Comptable']]},
+  {t:'Verbes irréguliers',p:[['Go → ?','Went'],['See → ?','Saw'],['Buy → ?','Bought'],['Write → ?','Wrote']]},
+  {t:'Modaux',p:[['Can','Pouvoir / Savoir'],['Should','Devoir (conseil)'],['Must','Devoir (obligation)'],['May','Pouvoir (permission)']]},
+  {t:'Saisons & Météo',p:[['Summer','Été'],['Winter','Hiver'],['Heat wave','Canicule'],['Drought','Sécheresse']]},
+  {t:'Corps & émotions',p:[['To be ashamed','Avoir honte'],['To be afraid','Avoir peur'],['To be hungry','Avoir faim'],['To be thirsty','Avoir soif']]},
+  {t:'Vocabulaire divers',p:[['Afterwards','Ensuite'],['Fortnight','Quinze jours'],['Traffic jam','Embouteillage'],['Deadline','Date limite']]},
+];
+
+let AS={i:0,selL:null,selR:null,matched:[],res:[]};
+function buildAsso(){AS={i:0,selL:null,selR:null,matched:[],res:[]};renderA();}
+function renderA(){
+  const el=document.getElementById('sec-asso');
+  if(AS.i>=AD.length){el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>Terminé !</h2><p>Tous les groupes complétés.</p><button class="btn btn-primary" onclick="buildAsso()">🔄 Recommencer</button></div>`;return;}
+  const d=AD[AS.i];
+  const sr=[...d.p.map(p=>p[1])].sort(()=>Math.random()-.5);
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · ${AS.i+1} / ${AD.length}</div>
+    <div class="question">Relie chaque expression à sa traduction.</div>
+    <div class="match-cols" id="ml">${d.p.map((p,i)=>`<button class="m-item" id="ml${i}" onclick="selM('l',${i},'${p[0].replace(/'/g,"\\'")}')">${esc(p[0])}</button>`).join('')}</div>
+    <div style="height:10px"></div>
+    <div class="match-cols" id="mr">${sr.map((r,i)=>`<button class="m-item" id="mr${i}" onclick="selM('r',${i},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('')}</div>
+    <div class="fb" id="afb"></div>
+  </div>`;
+  AS.matched=[];AS.selL=null;AS.selR=null;
+}
+function selM(side,idx,val){
+  if(side==='l'){document.querySelectorAll('#ml .m-item').forEach(b=>b.classList.remove('sel'));document.getElementById('ml'+idx).classList.add('sel');AS.selL={idx,val};}
+  else{document.querySelectorAll('#mr .m-item').forEach(b=>b.classList.remove('sel'));document.getElementById('mr'+idx).classList.add('sel');AS.selR={idx,val};}
+  if(AS.selL&&AS.selR){
+    const d=AD[AS.i];
+    const pair=d.p.find(p=>p[0]===AS.selL.val);
+    const ok=pair&&pair[1]===AS.selR.val;
+    const lel=document.querySelector('#ml .sel');
+    const rel=document.querySelector('#mr .sel');
+    if(ok){
+      if(lel)lel.classList.replace('sel','m-ok');
+      if(rel)rel.classList.replace('sel','m-ok');
+      AS.matched.push(AS.selL.val);score(true);
+      if(AS.matched.length===d.p.length){setTimeout(()=>{AS.i++;renderA();},600);}
+    } else {
+      if(lel){lel.classList.add('m-ko');setTimeout(()=>lel.classList.remove('sel','m-ko'),500);}
+      if(rel){rel.classList.add('m-ko');setTimeout(()=>rel.classList.remove('sel','m-ko'),500);}
+      score(false);
+    }
+    AS.selL=null;AS.selR=null;
+  }
+}
+
+/* ════════════════════════════════════
+   DATES & TEMPS
+════════════════════════════════════ */
+const DATED=[
+  {t:'Jours',q:'Comment dit-on "mercredi" ?',o:['Monday','Wednesday','Thursday','Saturday'],a:1},
+  {t:'Jours',q:'Jour après "Thursday" ?',o:['Wednesday','Saturday','Friday','Sunday'],a:2},
+  {t:'Jours',q:'"The weekend" = ?',o:['Lun. & Mar.','Jeu. & Ven.','Sam. & Dim.','Mer. & Jeu.'],a:2},
+  {t:'Mois',q:'Comment dit-on "août" ?',o:['July','June','August','October'],a:2},
+  {t:'Mois',q:'3ème mois de l\'année ?',o:['February','March','April','January'],a:1},
+  {t:'Mois',q:'"November" est le ___ mois :',o:['9ème','10ème','11ème','12ème'],a:2},
+  {t:'Ordinaux',q:'Ordinal de 1 ?',o:['1nd','1st','1th','1rd'],a:1},
+  {t:'Ordinaux',q:'Ordinal de 3 ?',o:['3st','3nd','3th','3rd'],a:3},
+  {t:'Ordinaux',q:'Ordinal de 22 ?',o:['22th','22rd','22nd','22st'],a:2},
+  {t:'Lire une date',q:'"April 3rd, 2026" se lit :',o:['The third of April, twenty twenty-six','April three, two thousand','Third April, two-six','The three of April'],a:0},
+  {t:'Heure',q:'"It\'s half past two" = ?',o:['2h00','2h15','2h30','2h45'],a:2},
+  {t:'Heure',q:'"It\'s quarter to five" = ?',o:['5h15','4h45','5h00','4h30'],a:1},
+  {t:'Heure',q:'"It\'s noon" = ?',o:['Minuit','Il est midi','11h','13h'],a:1},
+  {t:'Heure',q:'"What time is it?" = ?',o:['À quelle heure ?','Quelle heure est-il ?','Depuis quand ?','Quand arrives-tu ?'],a:1},
+  {t:'Durée',q:'"A decade" = ?',o:['1 an','5 ans','10 ans','100 ans'],a:2},
+  {t:'Durée',q:'"A century" = ?',o:['10 ans','50 ans','100 ans','1000 ans'],a:2},
+  {t:'Durée',q:'"Fortnight" = ?',o:['1 semaine','15 jours','1 mois','1 trimestre'],a:1},
+  {t:'Prépositions',q:'On utilise ___ avec les jours :',o:['in','on','at','by'],a:1},
+  {t:'Prépositions',q:'On utilise ___ avec les mois :',o:['on','at','in','by'],a:2},
+  {t:'Prépositions',q:'On utilise ___ avec l\'heure précise :',o:['in','on','at','for'],a:2},
+];
+
+let DS2={i:0,res:[]};
+function buildDates(){DS2={i:0,res:[]};renderDate();}
+function renderDate(){
+  const el=document.getElementById('sec-dates');
+  if(DS2.i>=DATED.length){
+    const ok=DS2.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=DATED.length*.8?'🏆':'📚'}</div><h2>${ok} / ${DATED.length}</h2><p>${ok>=DATED.length*.8?'Parfait !':'Revois le calendrier !'}</p><button class="btn btn-primary" onclick="buildDates()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=DATED[DS2.i];
+  const ref=`<div class="info-box"><b>📅 Jours :</b> Mon · Tue · Wed · Thu · Fri · Sat · Sun<br><b>📅 Mois :</b> Jan · Feb · Mar · Apr · May · Jun · Jul · Aug · Sep · Oct · Nov · Dec<br><b>🕐 Heure :</b> half past = et demie · quarter to = moins le quart · quarter past = et quart</div>`;
+  el.innerHTML=`${ref}<div class="dots">${dots(DATED,DS2.i,DS2.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${DS2.i+1} / ${DATED.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansDate(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="dfb2"></div>
+    <div class="nav" id="dnav2"></div>
+  </div>`;
+}
+function ansDate(i){
+  const d=DATED[DS2.i];
+  document.querySelectorAll('#sec-dates .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-dates .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('dfb2');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);DS2.res[DS2.i]=ok;
+  document.getElementById('dnav2').innerHTML=`<button class="btn btn-primary" onclick="DS2.i++;renderDate()">${DS2.i+1<DATED.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   NOMBRES
+════════════════════════════════════ */
+const NOMBED=[
+  {t:'Cardinaux',q:'"15" en anglais ?',o:['Fifty','Fifteen','Fiveteen','Fifty-one'],a:1},
+  {t:'Cardinaux',q:'"80" en anglais ?',o:['Eighteen','Eight','Eighty','Eight hundred'],a:2},
+  {t:'Cardinaux',q:'"125" en toutes lettres ?',o:['One hundred twenty five','One hundred and twenty-five','One twenty five','Twelve five'],a:1},
+  {t:'Cardinaux',q:'"13" en anglais ?',o:['Thirty','Thirteen','Three teen','Thirteen hundred'],a:1},
+  {t:'Cardinaux',q:'"1 000 000" en anglais ?',o:['One billion','One thousand','One hundred thousand','One million'],a:3},
+  {t:'Cardinaux',q:'"Forty-seven" = ?',o:['74','47','407','4700'],a:1},
+  {t:'Cardinaux',q:'"Two hundred" = ?',o:['20','200','2000','2'],a:1},
+  {t:'Ordinaux',q:'"Premier" en anglais ?',o:['Oneth','Firstly','First','One'],a:2},
+  {t:'Ordinaux',q:'"Deuxième" en anglais ?',o:['Second','Secondly','Twoth','Two'],a:0},
+  {t:'Ordinaux',q:'"Cinquième" en anglais ?',o:['Fiveth','Fifthy','Fifth','Fift'],a:2},
+  {t:'Ordinaux',q:'"Douzième" en anglais ?',o:['Twelveth','Twelvth','Twelfth','Twelth'],a:2},
+  {t:'Opérations',q:'"Two plus three equals ___"',o:['four','five','six','seven'],a:1},
+  {t:'Prix',q:'"$5.99" à voix haute ?',o:['Five and ninety-nine','Five dollars ninety-nine','Five point ninety-nine','Five ninety-nine'],a:1},
+  {t:'Fractions',q:'"Half" = ?',o:['1/3','1/4','1/2','3/4'],a:2},
+  {t:'Fractions',q:'"A quarter" = ?',o:['1/2','1/4','1/3','3/4'],a:1},
+  {t:'Téléphone',q:'"007" se lit :',o:['zero zero seven','oh oh seven','double zero seven','Tout est correct'],a:3},
+];
+
+let NS={i:0,res:[]};
+function buildNombres(){NS={i:0,res:[]};renderNombre();}
+function renderNombre(){
+  const el=document.getElementById('sec-nombres');
+  if(NS.i>=NOMBED.length){
+    const ok=NS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=NOMBED.length*.8?'🏆':'📚'}</div><h2>${ok} / ${NOMBED.length}</h2><p>${ok>=NOMBED.length*.8?'Parfait !':'Revois les nombres !'}</p><button class="btn btn-primary" onclick="buildNombres()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=NOMBED[NS.i];
+  const ref=`<div class="info-box"><b>🔢 Rappel :</b> 1 one · 2 two · 3 three · 4 four · 5 five · 6 six · 7 seven · 8 eight · 9 nine · 10 ten · 11 eleven · 12 twelve · 13 thirteen · 20 twenty · 30 thirty · 40 forty · 50 fifty · 100 one hundred · 1000 one thousand</div>`;
+  el.innerHTML=`${ref}<div class="dots">${dots(NOMBED,NS.i,NS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${NS.i+1} / ${NOMBED.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansNombre(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="nfb"></div>
+    <div class="nav" id="nnav"></div>
+  </div>`;
+}
+function ansNombre(i){
+  const d=NOMBED[NS.i];
+  document.querySelectorAll('#sec-nombres .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-nombres .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('nfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);NS.res[NS.i]=ok;
+  document.getElementById('nnav').innerHTML=`<button class="btn btn-primary" onclick="NS.i++;renderNombre()">${NS.i+1<NOMBED.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   TRADUCTION
+════════════════════════════════════ */
+const TD=[
+  {t:'To Be',fr:'Je ne suis pas en retard.',en:'I am not late.'},
+  {t:'To Be',fr:'Êtes-vous fatigué ?',en:'Are you tired?'},
+  {t:'To Be',fr:'Ils ne sont pas libres ce soir.',en:'They are not free tonight.'},
+  {t:'To Have',fr:'A-t-il une idée ?',en:'Has he got an idea?'},
+  {t:'To Have',fr:'Elle n\'a pas de temps.',en:'She does not have time.'},
+  {t:'Present Simple',fr:'Il mange du riz tous les jours.',en:'He eats rice every day.'},
+  {t:'Present Simple',fr:'Est-ce qu\'elle parle anglais ?',en:'Does she speak English?'},
+  {t:'Present Continuous',fr:'Ils jouent au football maintenant.',en:'They are playing football now.'},
+  {t:'Present Continuous',fr:'Je ne dors pas.',en:'I am not sleeping.'},
+  {t:'Past Simple',fr:'Elle a visité Paris l\'an dernier.',en:'She visited Paris last year.'},
+  {t:'Past Simple',fr:'Il n\'est pas allé à l\'école.',en:'He didn\'t go to school.'},
+  {t:'Future',fr:'Je t\'appellerai demain.',en:'I will call you tomorrow.'},
+  {t:'Future',fr:'Nous allons partir tôt.',en:'We are going to leave early.'},
+  {t:'Beaucoup',fr:'Il y a beaucoup de monde ici.',en:'There are a lot of people here.'},
+  {t:'WH Questions',fr:'Qui frappe à la porte ?',en:"Who's knocking at the door?"},
+  {t:'WH Questions',fr:'Laquelle des couleurs aimes-tu ?',en:'Which color do you like?'},
+  {t:'Introduction',fr:'Je voudrais vous présenter mon ami Diallo.',en:'I would like you to meet my friend Diallo.'},
+  {t:'Idiomes',fr:'J\'en ai marre de la chaleur.',en:'I am fed up with the heat.'},
+  {t:'Idiomes',fr:'Il avait raison et elle avait tort.',en:'He was right and she was wrong.'},
+  {t:'Modaux',fr:'Tu devrais voir un médecin.',en:'You should see a doctor.'},
+  {t:'Modaux',fr:'Elle sait conduire.',en:'She can drive.'},
+  {t:'Modaux',fr:'Tu ne dois pas fumer ici.',en:'You must not smoke here.'},
+  {t:'Dates',fr:'Le lundi 3 avril 2026.',en:'Monday, April 3rd, 2026.'},
+  {t:'Nombres',fr:'Il y a cent vingt-cinq élèves.',en:'There are one hundred and twenty-five students.'},
+  {t:'Vocabulaire',fr:'Il y a un embouteillage sur la route.',en:'There is a traffic jam on the road.'},
+];
+
+let TS={i:0,res:[]};
+function buildTrad(){TS={i:0,res:[]};renderT();}
+function renderT(){
+  const el=document.getElementById('sec-trad');
+  if(TS.i>=TD.length){
+    const ok=TS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=TD.length*.7?'🏆':'📚'}</div><h2>${ok} / ${TD.length}</h2><p>${ok>=TD.length*.7?'Très bien !':'Relis tes cours !'}</p><button class="btn btn-primary" onclick="buildTrad()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=TD[TS.i];
+  el.innerHTML=`<div class="dots">${dots(TD,TS.i,TS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${TS.i+1} / ${TD.length}</div>
+    <div class="question">Traduis en anglais :<br><em>${esc(d.fr)}</em></div>
+    <textarea class="fill-in" id="tin" rows="2" placeholder="Votre traduction..."></textarea>
+    <button class="btn" id="tbtn" onclick="checkT()">Vérifier</button>
+    <div class="fb" id="tfb"></div>
+    <div class="nav" id="tnav"></div>
+  </div>`;
+}
+function checkT(){
+  const d=TD[TS.i];
+  const val=document.getElementById('tin').value.trim().toLowerCase();
+  const exp=d.en.toLowerCase();
+  const words=exp.split(/\s+/);
+  const uwords=val.split(/\s+/).map(w=>w.replace(/[?.!,]/g,''));
+  const matches=words.filter(w=>uwords.includes(w.replace(/[?.!,]/g,''))).length;
+  const ok=matches>=Math.floor(words.length*0.65);
+  const fb=document.getElementById('tfb');
+  fb.innerHTML='✅ Réponse attendue : <strong>'+esc(d.en)+'</strong><br>'+(ok?'✓ Très bien !':'✗ Regardez la correction.');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);TS.res[TS.i]=ok;
+  document.getElementById('tbtn').disabled=true;
+  document.getElementById('tin').disabled=true;
+  document.getElementById('tnav').innerHTML=`<button class="btn btn-primary" onclick="TS.i++;renderT()">${TS.i+1<TD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   DIALOGUE
+════════════════════════════════════ */
+const DD=[
+  {t:'WH Questions',bank:['happening','restrooms','coming','crowded','Why'],
+   lines:[
+    {sp:'DIALLO',txt:"It's ___!",key:'crowded'},
+    {sp:'BEN',txt:"Yes, what's ___ here?",key:'happening'},
+    {sp:'DIALLO',txt:"Where are the ___?",key:'restrooms'},
+    {sp:'BEN',txt:"When are you ___ back?",key:'coming'},
+    {sp:'DIALLO',txt:"Gimme 5 min.",key:null},
+    {sp:'BEN',txt:"___ not!",key:'Why'},
+  ]},
+  {t:'To Have',bank:['time','impediment','appointment','full day','busy'],
+   lines:[
+    {sp:'EMMA',txt:"Diallo, do you have ___ tonight?",key:'time'},
+    {sp:'DIALLO',txt:"I have an ___ tonight.",key:'impediment'},
+    {sp:'EMMA',txt:"Do you have an ___?",key:'appointment'},
+    {sp:'DIALLO',txt:"Tomorrow I have a ___.",key:'full day'},
+    {sp:'EMMA',txt:"You are all the time ___.",key:'busy'},
+  ]},
+  {t:'To Be',bank:['rush','free','late','ready','sorry'],
+   lines:[
+    {sp:'BEN',txt:"Emma, why are you in a ___?",key:'rush'},
+    {sp:'EMMA',txt:"On Saturdays you are often ___.",key:'free'},
+    {sp:'BEN',txt:"Are you on time or ___?",key:'late'},
+    {sp:'EMMA',txt:"I'm getting ___ for the meeting.",key:'ready'},
+    {sp:'BEN',txt:"I'm ___ for you.",key:'sorry'},
+  ]},
+  {t:'Introduction',bank:['scarce','brother','engineer','pleasure','busy'],
+   lines:[
+    {sp:'DIALLO',txt:"Ben, you are getting ___.",key:'scarce'},
+    {sp:'BEN',txt:"These days, I'm very ___.",key:'busy'},
+    {sp:'BEN',txt:"This is my ___ Abdou.",key:'brother'},
+    {sp:'ABDOU',txt:"It's a ___ to meet you!",key:'pleasure'},
+    {sp:'DIALLO',txt:"I'm an ___ in electricity.",key:'engineer'},
+  ]},
+  {t:'Au restaurant',bank:['order','recommend','prefer','menu','available'],
+   lines:[
+    {sp:'WAITER',txt:"Here is the ___.",key:'menu'},
+    {sp:'DIALLO',txt:"What do you ___?",key:'recommend'},
+    {sp:'WAITER',txt:"The chicken is very ___.",key:'available'},
+    {sp:'DIALLO',txt:"I ___ fish actually.",key:'prefer'},
+    {sp:'WAITER',txt:"Would you like to ___ now?",key:'order'},
+  ]},
+  {t:'Au travail',bank:['meeting','deadline','report','urgent','schedule'],
+   lines:[
+    {sp:'BOSS',txt:"We have a ___ at 10am.",key:'meeting'},
+    {sp:'EMMA',txt:"I'll send you the ___ by then.",key:'report'},
+    {sp:'BOSS',txt:"The ___ is tomorrow.",key:'deadline'},
+    {sp:'EMMA',txt:"Is it ___?",key:'urgent'},
+    {sp:'BOSS',txt:"Check your ___ please.",key:'schedule'},
+  ]},
+];
+
+let DIAGS={i:0,sel:null,filled:{},res:[]};
+function buildDiag(){DIAGS={i:0,sel:null,filled:{},res:[]};renderDiag();}
+function renderDiag(){
+  const el=document.getElementById('sec-diag');
+  if(DIAGS.i>=DD.length){el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>Dialogues terminés !</h2><p>Bravo !</p><button class="btn btn-primary" onclick="buildDiag()">🔄 Recommencer</button></div>`;return;}
+  const d=DD[DIAGS.i];
+  const chips=d.bank.map((w,wi)=>`<button class="chip" id="ch${wi}" onclick="pickChip('${w.replace(/'/g,"\\'")}',${wi})">${esc(w)}</button>`).join('');
+  const lines=d.lines.map((l,li)=>{
+    if(!l.key)return`<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${esc(l.txt)}</div>`;
+    return`<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${l.txt.replace('___',`<span class="blank" id="bl${li}" onclick="fillBlank(${li})">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`)}</div>`;
+  }).join('');
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · Dialogue ${DIAGS.i+1} / ${DD.length}</div>
+    <div class="question">👆 Sélectionne un mot puis tape sur un blanc.</div>
+    <div class="bank">${chips}</div>
+    <div>${lines}</div>
+    <div style="margin-top:14px"><button class="btn" id="dbtn" onclick="checkDiag()">Vérifier</button></div>
+    <div class="fb" id="diafb"></div>
+    <div class="nav" id="dianav"></div>
+  </div>`;
+  DIAGS.sel=null;DIAGS.filled={};
+}
+function pickChip(word,wi){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+  document.getElementById('ch'+wi).classList.add('sel-chip');
+  DIAGS.sel={word,wi};
+}
+function fillBlank(li){
+  if(!DIAGS.sel)return;
+  const b=document.getElementById('bl'+li);
+  if(DIAGS.filled[li]){
+    const old=document.getElementById('ch'+DIAGS.filled[li].wi);
+    if(old)old.classList.remove('used');
+  }
+  DIAGS.filled[li]=DIAGS.sel;
+  b.textContent=DIAGS.sel.word;
+  document.getElementById('ch'+DIAGS.sel.wi).classList.add('used');
+  document.getElementById('ch'+DIAGS.sel.wi).classList.remove('sel-chip');
+  DIAGS.sel=null;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+}
+function checkDiag(){
+  const d=DD[DIAGS.i];let ok=0,tot=0;
+  d.lines.forEach((l,li)=>{
+    if(!l.key)return;tot++;
+    const b=document.getElementById('bl'+li);
+    if(DIAGS.filled[li]&&DIAGS.filled[li].word.toLowerCase()===l.key.toLowerCase()){b.classList.add('b-ok');ok++;}
+    else{b.classList.add('b-ko');b.textContent=l.key;}
+  });
+  const allOk=ok===tot;
+  score(allOk);DIAGS.res[DIAGS.i]=allOk;
+  const fb=document.getElementById('diafb');
+  fb.textContent=allOk?'✓ Parfait !':'✗ '+ok+'/'+tot+' — Corrections en vert.';
+  fb.className='fb '+(allOk?'ok':'ko');
+  document.getElementById('dbtn').disabled=true;
+  document.getElementById('dianav').innerHTML=`<button class="btn btn-primary" onclick="DIAGS.i++;renderDiag()">${DIAGS.i+1<DD.length?'Dialogue suivant →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   VOCABULAIRE
+════════════════════════════════════ */
+const VOCD=[
+  {t:'Famille',q:'"Nephew" →',o:['Nièce','Neveu','Cousin','Oncle'],a:1},
+  {t:'Famille',q:'"Mother-in-law" →',o:['Belle-sœur','Belle-fille','Belle-mère','Tante'],a:2},
+  {t:'Famille',q:'"Siblings" →',o:['Parents','Frères et sœurs','Amis','Enfants'],a:1},
+  {t:'Famille',q:'"Twins" →',o:['Triplés','Jumeaux','Aînés','Cousins'],a:1},
+  {t:'Corps humain',q:'"Knee" →',o:['Cheville','Poignet','Genou','Coude'],a:2},
+  {t:'Corps humain',q:'"Shoulder" →',o:['Épaule','Poitrine','Dos','Hanche'],a:0},
+  {t:'Corps humain',q:'"Thumb" →',o:['Index','Annulaire','Auriculaire','Pouce'],a:3},
+  {t:'Couleurs',q:'"Purple" →',o:['Rose','Violet','Bordeaux','Bleu marine'],a:1},
+  {t:'Couleurs',q:'"Teal" →',o:['Turquoise','Vert citron','Bordeaux','Magenta'],a:0},
+  {t:'Maison',q:'"Ceiling" →',o:['Plancher','Mur','Plafond','Toit'],a:2},
+  {t:'Maison',q:'"Stairs" →',o:['Couloir','Escaliers','Ascenseur','Porte'],a:1},
+  {t:'Lieux',q:'"Embassy" →',o:['Hôpital','Ambassade','Mairie','Tribunal'],a:1},
+  {t:'Lieux',q:'"Pharmacy" →',o:['Librairie','Pharmacie','Épicerie','Boulangerie'],a:1},
+  {t:'Nourriture',q:'"Seafood" →',o:['Légumes','Fruits de mer','Algues','Poisson fumé'],a:1},
+  {t:'Nourriture',q:'"Leftovers" →',o:['Restes de repas','Entrées','Desserts','Condiments'],a:0},
+  {t:'Météo',q:'"Drought" →',o:['Orage','Sécheresse','Grêle','Brouillard'],a:1},
+  {t:'Météo',q:'"Lightning" →',o:['Tonnerre','Foudre / éclair','Averse','Tornade'],a:1},
+  {t:'Météo',q:'"Overcast" →',o:['Ensoleillé','Nuageux / couvert','Brumeux','Venteux'],a:1},
+  {t:'Transports',q:'"Fare" →',o:['Itinéraire','Arrêt','Tarif billet','Retard'],a:2},
+  {t:'Transports',q:'"Roundabout" →',o:['Autoroute','Rond-point','Passage clouté','Carrefour'],a:1},
+  {t:'Émotions',q:'"Overwhelmed" →',o:['Indifférent','Dépassé / submergé','Enthousiaste','Gêné'],a:1},
+  {t:'Émotions',q:'"Relieved" →',o:['Inquiet','Soulagé','Jaloux','Confus'],a:1},
+  {t:'Émotions',q:'"Grateful" →',o:['Méfiant','Reconnaissant','Curieux','Nerveux'],a:1},
+  {t:'Travail',q:'"Deadline" →',o:['Réunion','Date limite','Contrat','Fiche de paie'],a:1},
+  {t:'Travail',q:'"Colleague" →',o:['Supérieur','Subordonné','Collègue','Client'],a:2},
+  {t:'Travail',q:'"Wage" →',o:['Congé','Promotion','Salaire','Poste'],a:2},
+  {t:'Vocabulaire',q:'"To embarrass" →',o:['impressionner','embarrasser / gêner','féliciter','ignorer'],a:1},
+  {t:'Vocabulaire',q:'"Sunrise" →',o:['Coucher de soleil','Arc-en-ciel','Lever de soleil','Nuage'],a:2},
+  {t:'Vocabulaire',q:'"To afford" →',o:['offrir','avoir les moyens de','acheter','vendre'],a:1},
+  {t:'Vocabulaire',q:'"What a mess!" →',o:['Quel beau travail !','Quel gâchis !','Quel monde !','Quelle chance !'],a:1},
+];
+
+let VS={i:0,res:[]};
+function buildVoc(){VS={i:0,res:[]};renderVoc();}
+function renderVoc(){
+  const el=document.getElementById('sec-voc');
+  if(VS.i>=VOCD.length){
+    const ok=VS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=VOCD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${VOCD.length}</h2><p>${ok>=VOCD.length*.8?'Vocabulaire maîtrisé !':'Continue à apprendre !'}</p><button class="btn btn-primary" onclick="buildVoc()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=VOCD[VS.i];
+  el.innerHTML=`<div class="dots">${dots(VOCD,VS.i,VS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${VS.i+1} / ${VOCD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansVoc(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="vfb"></div>
+    <div class="nav" id="vnav"></div>
+  </div>`;
+}
+function ansVoc(i){
+  const d=VOCD[VS.i];
+  document.querySelectorAll('#sec-voc .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-voc .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('vfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);VS.res[VS.i]=ok;
+  document.getElementById('vnav').innerHTML=`<button class="btn btn-primary" onclick="VS.i++;renderVoc()">${VS.i+1<VOCD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ════════════════════════════════════
+   MODAUX
+════════════════════════════════════ */
+const MODALD=[
+  {t:'Can – Capacité',q:'Lequel exprime une capacité ?',o:['You must come.','She can swim.','He should rest.','They may leave.'],a:1},
+  {t:'Can – Permission',q:'Demande de permission polie :',o:['I can go?','Can I go, please?','I must go?','I should go?'],a:1},
+  {t:'Could',q:'"Could you help me?" exprime :',o:['une obligation','une capacité passée','une demande polie','une interdiction'],a:2},
+  {t:'Could',q:'"She could run fast when she was young." →',o:['Elle doit courir','Elle pouvait courir','Elle peut courir','Elle devrait courir'],a:1},
+  {t:'Should',q:'"Should" sert pour :',o:['une interdiction forte','un conseil','une obligation légale','une permission'],a:1},
+  {t:'Should',q:'Phrase correcte :',o:['You should to rest.','You should resting.','You should rest.','You should rests.'],a:2},
+  {t:'Must',q:'"You must wear a seatbelt." →',o:['Tu devrais porter','Tu peux porter','Tu dois porter','Tu porteras'],a:2},
+  {t:'Must not',q:'"You must not smoke here." →',o:['Tu ne devrais pas fumer','Inutile de fumer','Tu n\'es pas obligé','Il est interdit de fumer'],a:3},
+  {t:'Have to',q:'"I have to work tomorrow." →',o:['Je veux travailler','Je dois travailler','Je peux travailler','Je vais travailler'],a:1},
+  {t:'Don\'t have to',q:'"You don\'t have to come." →',o:['Tu ne peux pas','Il est interdit','Tu n\'es pas obligé','Tu ne devrais pas'],a:2},
+  {t:'May',q:'"May" sert pour :',o:['une obligation','une interdiction','une capacité physique','une permission / possibilité'],a:3},
+  {t:'Might',q:'"It might rain." →',o:['Il pleut sûrement','Il ne pleuvra pas','Il pourrait pleuvoir','Il a plu'],a:2},
+  {t:'Would',q:'"Would you like some tea?" est :',o:['une obligation','une offre polie','une interdiction','une capacité'],a:1},
+  {t:'Récap',q:'Modal = interdiction forte ?',o:['Should not','Could not','Must not','Might not'],a:2},
+  {t:'Récap',q:'Modal = conseil ?',o:['Must','Can','Should','Will'],a:2},
+  {t:'Récap',q:'Modal = capacité ?',o:['Must','Should','Can','Would'],a:2},
+  {t:'Récap',q:'"Needn\'t" = ?',o:['Must not','Don\'t have to','Shouldn\'t','Can\'t'],a:1},
+  {t:'Récap',q:'Modal = possibilité incertaine ?',o:['Must','Should','Can','Might'],a:3},
+];
+
+let MS={i:0,res:[]};
+function buildModal(){MS={i:0,res:[]};renderModal();}
+function renderModal(){
+  const el=document.getElementById('sec-modal');
+  if(MS.i>=MODALD.length){
+    const ok=MS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=MODALD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${MODALD.length}</h2><p>${ok>=MODALD.length*.8?'Modaux maîtrisés !':'Revois les modaux !'}</p><button class="btn btn-primary" onclick="buildModal()">🔄 Recommencer</button></div>`;return;
+  }
+  const d=MODALD[MS.i];
+  const ref=`<div class="info-box"><b>⚙️ Modaux :</b> can (capacité) · could (passé/politesse) · should (conseil) · must (obligation) · must not (interdit) · may/might (possibilité) · would (politesse) · have to (obligation) · don't have to (pas obligatoire)</div>`;
+  el.innerHTML=`${ref}<div class="dots">${dots(MODALD,MS.i,MS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${MS.i+1} / ${MODALD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansModal(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="mfb"></div>
+    <div class="nav" id="mnav"></div>
+  </div>`;
+}
+function ansModal(i){
+  const d=MODALD[MS.i];
+  document.querySelectorAll('#sec-modal .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-modal .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok)opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('mfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);MS.res[MS.i]=ok;
+  document.getElementById('mnav').innerHTML=`<button class="btn btn-primary" onclick="MS.i++;renderModal()">${MS.i+1<MODALD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* INIT */
+buildQCM();buildConj();buildLac();buildAsso();buildDates();buildNombres();buildTrad();buildDiag();buildVoc();buildModal();
+</script>
+</body>
+</html>

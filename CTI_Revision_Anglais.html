@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTI — Cahier de Révision Anglais Complet</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f6;
+  --bg2: #f0ede6;
+  --bg3: #e8e4db;
+  --text: #1c1a14;
+  --text2: #6b6860;
+  --text3: #9a9890;
+  --border: rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.18);
+  --accent: #1a4a8a;
+  --accent2: #d4a840;
+  --green-bg: #e8f5d8; --green-bd: #4a8a1a; --green-tx: #2d5a0e;
+  --red-bg: #fdeaea; --red-bd: #8a1a1a; --red-tx: #5a0e0e;
+  --blue-bg: #e0ecfa; --blue-tx: #1a4a8a;
+  --gold: #d4a840;
+  --radius: 12px; --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16140f; --bg2: #201e17; --bg3: #2a2720;
+    --text: #f0ece2; --text2: #a8a49a; --text3: #706e66;
+    --border: rgba(255,255,255,0.10); --border2: rgba(255,255,255,0.18);
+    --accent: #4a7ac8; --accent2: #e0b84a;
+    --green-bg: #0e2a04; --green-bd: #2d5a0e; --green-tx: #a8d878;
+    --red-bg: #2a0808; --red-bd: #5a0e0e; --red-tx: #e88888;
+    --blue-bg: #081830; --blue-tx: #6898d8;
+    --gold: #e0b84a;
+  }
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+.app { max-width: 820px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+/* HEADER */
+.header {
+  text-align: center; margin-bottom: 1.5rem;
+  padding: 2rem 1.5rem 1.5rem;
+  background: var(--accent);
+  border-radius: var(--radius);
+  color: #fff;
+  position: relative; overflow: hidden;
+}
+.header::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.header::after {
+  content: ''; position: absolute; bottom: -30px; left: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.header .logo {
+  display: inline-block; background: var(--gold); color: #1c1a14;
+  font-size: 10px; font-weight: 700; padding: 4px 12px;
+  border-radius: 4px; letter-spacing: 0.1em; margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+.header h1 { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 6px; color: #fff; }
+.header p { font-size: 13px; opacity: 0.75; }
+
+/* SCORE */
+.score-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; background: var(--bg);
+  border-radius: var(--radius); border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+.score-label { font-size: 12px; color: var(--text2); white-space: nowrap; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.score-val { font-size: 18px; font-weight: 600; white-space: nowrap; min-width: 64px; color: var(--accent); }
+.score-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; background: var(--green-bd); border-radius: 3px; transition: width 0.5s ease; width: 0%; }
+.score-pct { font-size: 13px; color: var(--text2); white-space: nowrap; min-width: 40px; text-align: right; font-weight: 500; }
+
+/* TABS SCROLL */
+.tabs-wrap { overflow-x: auto; margin-bottom: 1.25rem; padding-bottom: 4px; }
+.tabs-wrap::-webkit-scrollbar { height: 4px; }
+.tabs-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.tabs { display: flex; gap: 6px; min-width: max-content; }
+.tab {
+  padding: 7px 16px; border-radius: 20px;
+  border: 1px solid var(--border2); font-size: 12px;
+  cursor: pointer; background: transparent; color: var(--text2);
+  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  font-weight: 500; white-space: nowrap;
+}
+.tab:hover { background: var(--bg2); color: var(--text); }
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* SECTION */
+.section { display: none; }
+.section.active { display: block; }
+
+/* CARD */
+.card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem;
+  margin-bottom: 1rem;
+}
+.card-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 0.7rem;
+}
+.question { font-size: 15px; color: var(--text); margin-bottom: 1rem; line-height: 1.6; }
+.question em { font-style: italic; color: var(--text2); }
+.question strong { color: var(--accent); }
+
+/* PROGRESS DOTS */
+.dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); flex-shrink: 0; transition: background 0.2s; }
+.dot.ok { background: var(--green-bd); }
+.dot.ko { background: var(--red-bd); }
+.dot.cur { background: var(--accent); }
+
+/* QCM OPTIONS */
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  padding: 11px 16px; border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 14px; color: var(--text); background: transparent;
+  text-align: left; transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif; line-height: 1.45;
+}
+.option:hover:not(.locked) { background: var(--bg2); border-color: var(--accent); }
+.option.correct { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+.option.wrong { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+.option.reveal { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); }
+
+/* FEEDBACK */
+.fb {
+  margin-top: 0.8rem; padding: 10px 14px;
+  border-radius: var(--radius-sm); font-size: 13px;
+  display: none; line-height: 1.55;
+}
+.fb.ok { background: var(--green-bg); color: var(--green-tx); display: block; border-left: 3px solid var(--green-bd); }
+.fb.ko { background: var(--red-bg); color: var(--red-tx); display: block; border-left: 3px solid var(--red-bd); }
+
+/* BUTTONS */
+.btn {
+  padding: 9px 20px; border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 13px;
+  cursor: pointer; background: transparent; color: var(--text);
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s; font-weight: 500;
+}
+.btn:hover { background: var(--bg2); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { opacity: 0.88; background: var(--accent); }
+.nav { display: flex; justify-content: flex-end; margin-top: 1rem; gap: 8px; }
+
+/* INPUTS */
+.fill-in {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: var(--bg2);
+  margin-bottom: 8px; outline: none;
+  transition: border-color 0.15s;
+}
+.fill-in:focus { border-color: var(--accent); }
+.hint {
+  font-size: 12px; color: var(--text3); margin-bottom: 10px;
+  padding: 6px 10px; background: var(--bg2);
+  border-radius: var(--radius-sm); display: inline-block;
+}
+
+/* MATCH */
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.m-item {
+  padding: 11px 12px; border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); font-size: 13px;
+  cursor: pointer; text-align: center; color: var(--text);
+  background: transparent; font-family: 'DM Sans', sans-serif;
+  line-height: 1.4; transition: all 0.15s;
+}
+.m-item:hover { background: var(--bg2); border-color: var(--accent); }
+.m-item.sel { background: var(--blue-bg); border-color: var(--accent); }
+.m-item.m-ok { background: var(--green-bg); border-color: var(--green-bd); color: var(--green-tx); pointer-events: none; }
+.m-item.m-ko { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-tx); }
+.match-sep { height: 12px; }
+
+/* DIALOGUE */
+.bank { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1rem; }
+.chip {
+  padding: 6px 14px; border: 1px solid var(--border2);
+  border-radius: 20px; font-size: 13px; cursor: pointer;
+  color: var(--text); background: transparent;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+}
+.chip:hover:not(.used) { background: var(--bg2); border-color: var(--accent); }
+.chip.sel-chip { border-color: var(--accent); background: var(--blue-bg); color: var(--blue-tx); }
+.chip.used { opacity: 0.28; pointer-events: none; }
+.diag-line { margin: 8px 0; font-size: 14px; line-height: 1.65; }
+.diag-line strong { color: var(--accent); font-weight: 600; }
+.blank {
+  display: inline-block; min-width: 90px; border-bottom: 2px solid var(--border2);
+  margin: 0 4px; text-align: center; cursor: pointer;
+  padding: 0 6px; color: var(--text); font-size: 14px;
+  transition: border-color 0.15s;
+}
+.blank:hover { border-bottom-color: var(--accent); }
+.blank.b-ok { border-bottom-color: var(--green-bd); color: var(--green-tx); }
+.blank.b-ko { border-bottom-color: var(--red-bd); color: var(--red-tx); }
+
+/* TEXTAREA */
+textarea.fill-in { resize: vertical; min-height: 68px; }
+
+/* CONGRATS */
+.congrats { text-align: center; padding: 2.5rem 1rem; }
+.congrats .emoji { font-size: 40px; margin-bottom: 0.6rem; }
+.congrats h2 { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 0.5rem; }
+.congrats p { color: var(--text2); font-size: 14px; margin-bottom: 1.5rem; }
+
+/* GRID for time/numbers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ref-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 13px; line-height: 1.7;
+}
+.ref-box h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 6px; }
+
+/* SECTION INTRO */
+.sec-intro {
+  background: var(--blue-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 13px; color: var(--blue-tx); margin-bottom: 1rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 520px) {
+  .match-cols { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .header h1 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">Community Training International</div>
+    <h1>Cahier de Révision — English</h1>
+    <p>QCM · Lacunes · Association · Conjugaison · Dates · Nombres · Temps · Dialogue · Traduction · Vocabulaire</p>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">Score</span>
+    <span class="score-val" id="sv">0 / 0</span>
+    <div class="score-track"><div class="score-fill" id="sf"></div></div>
+    <span class="score-pct" id="sp">—</span>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="showSec('qcm',this)">QCM</button>
+      <button class="tab" onclick="showSec('conj',this)">Conjugaison</button>
+      <button class="tab" onclick="showSec('lac',this)">Lacunes</button>
+      <button class="tab" onclick="showSec('asso',this)">Association</button>
+      <button class="tab" onclick="showSec('dates',this)">Dates & Temps</button>
+      <button class="tab" onclick="showSec('nombres',this)">Nombres</button>
+      <button class="tab" onclick="showSec('trad',this)">Traduction</button>
+      <button class="tab" onclick="showSec('diag',this)">Dialogue</button>
+      <button class="tab" onclick="showSec('voc',this)">Vocabulaire</button>
+      <button class="tab" onclick="showSec('modal',this)">Modaux</button>
+    </div>
+  </div>
+
+  <div id="sec-qcm" class="section active"></div>
+  <div id="sec-conj" class="section"></div>
+  <div id="sec-lac" class="section"></div>
+  <div id="sec-asso" class="section"></div>
+  <div id="sec-dates" class="section"></div>
+  <div id="sec-nombres" class="section"></div>
+  <div id="sec-trad" class="section"></div>
+  <div id="sec-diag" class="section"></div>
+  <div id="sec-voc" class="section"></div>
+  <div id="sec-modal" class="section"></div>
+</div>
+
+<script>
+'use strict';
+let totOk=0, totAns=0;
+function score(ok){
+  totAns++; if(ok) totOk++;
+  document.getElementById('sv').textContent=totOk+' / '+totAns;
+  const p=totAns?Math.round(totOk/totAns*100):0;
+  document.getElementById('sf').style.width=p+'%';
+  document.getElementById('sp').textContent=totAns?p+'%':'—';
+}
+function showSec(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function dots(data,cur,results){
+  return data.map((_,i)=>{
+    let c='dot';
+    if(i<cur) c+=results[i]?' ok':' ko';
+    else if(i===cur) c+=' cur';
+    return '<div class="'+c+'"></div>';
+  }).join('');
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ======================== QCM ======================== */
+const QD=[
+  // ALPHABET
+  {t:'Alphabet',q:'Comment se prononce la lettre H en anglais ?',o:['éïch','hache','ki','bi'],a:0},
+  {t:'Alphabet',q:'Combien de lettres dans l\'alphabet anglais ?',o:['24','25','26','27'],a:2},
+  {t:'Alphabet',q:'Comment se prononce G ?',o:['gé','dji','gi','je'],a:1},
+  {t:'Alphabet',q:'Comment se prononce W ?',o:['vi','double v','dabel you','oué'],a:2},
+  {t:'Alphabet',q:'Comment se prononce la lettre Y ?',o:['yi','oui','waï','yé'],a:2},
+  {t:'Alphabet',q:'Quelle lettre se prononce "zi" ou "zed" ?',o:['S','X','Z','C'],a:2},
+  // WH QUESTIONS
+  {t:'WH Questions',q:'Quelle WH question correspond à "pourquoi" ?',o:['When','Where','Why','Which'],a:2},
+  {t:'WH Questions',q:'Quelle WH question utilise-t-on pour une personne (sujet) ?',o:['Whom','Whose','Which','Who'],a:3},
+  {t:'WH Questions',q:'"Laquelle des couleurs préfères-tu ?" se traduit par :',o:['What color do you prefer?','Which color do you prefer?','Who color?','Where color?'],a:1},
+  {t:'WH Questions',q:'"Whose" signifie :',o:['qui','où','dont / duquel','quand'],a:2},
+  {t:'WH Questions',q:'"When were you born?" signifie :',o:['Où es-tu né ?','Qui es-tu ?','Quand es-tu né ?','Pourquoi es-tu né ?'],a:2},
+  {t:'WH Questions',q:'"How" sert à :',o:['demander une durée','demander un lieu','demander la manière / façon','demander une quantité'],a:2},
+  {t:'WH Questions',q:'"How far is it?" signifie :',o:['C\'est loin ?','C\'est comment ?','C\'est combien ?','Depuis quand ?'],a:0},
+  // TO BE
+  {t:'To Be',q:'Forme correcte pour "he" au présent :',o:['He are','He am','He is','He be'],a:2},
+  {t:'To Be',q:'La forme interro-négative de "You are" est :',o:['Are you not?','You are not?','Is you not?','Not are you?'],a:0},
+  {t:'To Be',q:'"To be late" signifie :',o:['être fatigué','être en retard','être occupé','être libre'],a:1},
+  {t:'To Be',q:'"We are not" se traduit par :',o:['nous ne sommes pas','nous n\'avons pas','nous ne sommes','vous n\'êtes pas'],a:0},
+  {t:'To Be',q:'"I\'m off" signifie :',o:['Je suis en retard','Je suis fatigué','Je m\'en vais','Je suis libre'],a:2},
+  {t:'To Be',q:'Au passé, quelle forme utilise-t-on pour "they" ?',o:['they was','they were','they be','they been'],a:1},
+  {t:'To Be',q:'"She was not here" est la forme :',o:['présent négatif','passé négatif','futur négatif','présent interrogatif'],a:1},
+  // TO HAVE
+  {t:'To Have',q:'Forme correcte pour "he" :',o:['He have','He had','He has','He haves'],a:2},
+  {t:'To Have',q:'"Don\'t" est équivalent à :',o:["Doesn't","Do not","Didn't","Won't"],a:1},
+  {t:'To Have',q:'"To have an impediment" signifie :',o:['avoir une idée','avoir pitié','avoir un empêchement','avoir des mots'],a:2},
+  {t:'To Have',q:'Phrase correcte ?',o:['Do she have time?','Does she have time?','Has she time done?','Is she have time?'],a:1},
+  {t:'To Have',q:'"Had" est le passé de :',o:['To be','To have','To do','To go'],a:1},
+  // PRESENT SIMPLE
+  {t:'Present Simple',q:'On utilise le Present Simple pour :',o:['une action en cours','une habitude / vérité générale','une action future planifiée','une action passée récente'],a:1},
+  {t:'Present Simple',q:'Quelle terminaison prend le verbe à la 3ème pers. sing. ?',o:['-ing','-ed','-s / -es','rien'],a:2},
+  {t:'Present Simple',q:'Forme négative correcte :',o:['She not work','She doesn\'t works','She doesn\'t work','She don\'t work'],a:2},
+  {t:'Present Simple',q:'Question correcte au Present Simple :',o:['Do he work here?','Does he works here?','Does he work here?','Is he work here?'],a:2},
+  // PRESENT CONTINUOUS
+  {t:'Present Continuous',q:'On forme le Present Continuous avec :',o:['To be + infinitif','To be + verbe-ing','To have + verbe-ing','will + verbe'],a:1},
+  {t:'Present Continuous',q:'"They are playing" est au :',o:['Past Simple','Present Simple','Present Continuous','Future'],a:2},
+  {t:'Present Continuous',q:'Forme interrogative de "She is cooking" :',o:['Is she cooking?','Does she cooking?','She is cooking?','Is she cook?'],a:0},
+  {t:'Present Continuous',q:'Spelling : "run" au Present Continuous →',o:['runing','running','running','runs'],a:1},
+  // PAST SIMPLE
+  {t:'Past Simple',q:'"I worked" est un passé :',o:['irrégulier','régulier','futur','continu'],a:1},
+  {t:'Past Simple',q:'Passé de "go" ?',o:['goed','gone','went','go'],a:2},
+  {t:'Past Simple',q:'Passé de "see" ?',o:['seed','sawed','seen','saw'],a:3},
+  {t:'Past Simple',q:'Forme négative du passé :',o:['I didn\'t went','I not went','I didn\'t go','I don\'t went'],a:2},
+  {t:'Past Simple',q:'Passé de "buy" ?',o:['buyed','buyed','bought','boughted'],a:2},
+  // FUTUR
+  {t:'Future',q:'On utilise "will" pour :',o:['une habitude','une décision spontanée','une action en cours','une action passée'],a:1},
+  {t:'Future',q:'"Going to" exprime :',o:['une décision spontanée','une intention / plan prévu','une vérité générale','une action au passé'],a:1},
+  {t:'Future',q:'Forme correcte :',o:['She will goes','She will go','She going to go','She go to will'],a:1},
+  // BEAUCOUP
+  {t:'Beaucoup',q:'"Much" s\'utilise avec :',o:['noms dénombrables pluriels','noms indénombrables','noms propres','verbes'],a:1},
+  {t:'Beaucoup',q:'Phrase correcte :',o:['She speaks much languages.','She speaks many languages.','She speaks several language.','She speaks lots language.'],a:1},
+  {t:'Beaucoup',q:'"Fortnight" signifie :',o:['un mois','une semaine','quinze jours','une heure'],a:2},
+  {t:'Beaucoup',q:'"A little" s\'utilise avec :',o:['noms dénombrables','noms indénombrables','verbes seulement','adjectifs seulement'],a:1},
+  {t:'Beaucoup',q:'"Few" signifie :',o:['beaucoup','aucun','peu de (dénombrable)','un peu de (indénombrable)'],a:2},
+  // IDIOMES
+  {t:'Idiomes',q:'"To be fed up with" signifie :',o:['avoir faim','en avoir marre de','avoir de la chance','avoir sommeil'],a:1},
+  {t:'Idiomes',q:'"I am thirsty" signifie :',o:['J\'ai faim','J\'ai froid','J\'ai soif','J\'ai sommeil'],a:2},
+  {t:'Idiomes',q:'"To be right" signifie :',o:['avoir tort','être à droite','avoir raison','être correct'],a:2},
+  {t:'Idiomes',q:'"She is ashamed" signifie :',o:['Elle a peur','Elle a honte','Elle a chaud','Elle est malade'],a:1},
+  {t:'Idiomes',q:'"To be seasick" signifie :',o:['avoir chaud','avoir le mal de mer','avoir peur','être pressé'],a:1},
+  // INTRODUCTION
+  {t:'Introduction',q:'Comment introduit-on quelqu\'un d\'autre ?',o:['My name is...','I go by...','Let me introduce you to...','Nice to meet you!'],a:2},
+  {t:'Introduction',q:'"Pleased to meet you!" est une façon de :',o:['se présenter soi-même','répondre à une présentation','introduire quelqu\'un','demander un nom'],a:1},
+  {t:'Introduction',q:'"Self employed" signifie :',o:['confiance en soi','développement personnel','travailleur indépendant','libre service'],a:2},
+  // VOCABULAIRE
+  {t:'Vocabulaire',q:'"Afterwards" signifie :',o:['avant','pendant','ensuite','depuis'],a:2},
+  {t:'Vocabulaire',q:'"What a mess!" traduit :',o:['Quel beau travail !','Quel gâchis !','Quel monde !','Quelle chance !'],a:1},
+  {t:'Vocabulaire',q:'"Traffic jam" signifie :',o:['accident','feu rouge','embouteillage','autoroute'],a:2},
+  {t:'Vocabulaire',q:'"Heat wave" signifie :',o:['vague de froid','canicule','pluie','chaleur normale'],a:1},
+  {t:'Vocabulaire',q:'"To get scarce" signifie :',o:['devenir célèbre','se faire rare','être pressé','trouver de la place'],a:1},
+  {t:'Vocabulaire',q:'"Siblings" signifie :',o:['parents','frères et sœurs','amis','collègues'],a:1},
+  {t:'Vocabulaire',q:'"Sunrise" signifie :',o:['coucher de soleil','arc-en-ciel','lever de soleil','nuage'],a:2},
+  {t:'Vocabulaire',q:'"To afford" signifie :',o:['offrir','avoir les moyens de','acheter','vendre'],a:1},
+];
+
+let QS={i:0,res:[]};
+function buildQCM(){QS={i:0,res:[]};renderQ();}
+function renderQ(){
+  const el=document.getElementById('sec-qcm');
+  if(QS.i>=QD.length){
+    const ok=QS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=QD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${QD.length} bonnes réponses</h2><p>${ok>=QD.length*.8?'Excellent travail !':'Continue de t\'entraîner !'}</p><button class="btn btn-primary" onclick="buildQCM()">Recommencer</button></div>`;
+    return;
+  }
+  const d=QD[QS.i];
+  el.innerHTML=`<div class="dots">${dots(QD,QS.i,QS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${QS.i+1} / ${QD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options" id="qopts">${d.o.map((o,i)=>`<button class="option" onclick="ansQ(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="qfb"></div>
+    <div class="nav" id="qnav"></div>
+  </div>`;
+}
+function ansQ(i){
+  const d=QD[QS.i];
+  document.querySelectorAll('.option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('.option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('qfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ La bonne réponse était : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);QS.res[QS.i]=ok;
+  document.getElementById('qnav').innerHTML=`<button class="btn btn-primary" onclick="QS.i++;renderQ()">${QS.i+1<QD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ======================== CONJUGAISON ======================== */
+const CONJD=[
+  // TO BE PRESENT
+  {t:'To Be – Présent',q:'Complétez : I ___ a student.',b:['am'],h:'1ère pers. sing.'},
+  {t:'To Be – Présent',q:'Complétez : She ___ my sister.',b:['is'],h:'3ème pers. sing.'},
+  {t:'To Be – Présent',q:'Complétez : We ___ tired.',b:['are'],h:'1ère pers. plur.'},
+  {t:'To Be – Présent',q:'Complétez : ___ they ready?',b:['Are'],h:'Interrogatif / They'},
+  {t:'To Be – Présent',q:'Forme contractée de "I am not" :',b:["I'm not"],h:'Contraction'},
+  // TO BE PAST
+  {t:'To Be – Passé',q:'Complétez : He ___ not here yesterday.',b:['was'],h:'3ème pers. sing.'},
+  {t:'To Be – Passé',q:'Complétez : They ___ at school.',b:['were'],h:'Plur. passé'},
+  {t:'To Be – Passé',q:'___ you at home last night?',b:['Were'],h:'Interrogatif passé'},
+  // PRESENT SIMPLE
+  {t:'Present Simple',q:'She ___ (work) every day.',b:['works'],h:'3ème pers. sing. → +s'},
+  {t:'Present Simple',q:'He ___ (go) to school.',b:['goes'],h:'→ +es après go/do'},
+  {t:'Present Simple',q:'They ___ (not / like) fish.',b:["don't like"],h:'Nég. plur.'},
+  {t:'Present Simple',q:'___ he ___ (speak) French? (2 mots)',b:['Does','speak'],h:'Interrog. 3ème pers.'},
+  {t:'Present Simple',q:'She ___ (study) English every day.',b:['studies'],h:'y → ies'},
+  // PRESENT CONTINUOUS
+  {t:'Present Continuous',q:'He ___ (run) right now.',b:['is running'],h:'is + V-ing'},
+  {t:'Present Continuous',q:'We ___ (not / eat) lunch.',b:["aren't eating"],h:'Nég. cont.'},
+  {t:'Present Continuous',q:'___ she ___ (sleep)? (2 mots)',b:['Is','sleeping'],h:'Interrog. cont.'},
+  {t:'Present Continuous',q:'I ___ (sit) on the chair.',b:['am sitting'],h:'am + V-ing'},
+  // PAST SIMPLE
+  {t:'Past Simple',q:'She ___ (visit) Paris last year.',b:['visited'],h:'Verbe régulier +ed'},
+  {t:'Past Simple',q:'He ___ (buy) a new car.',b:['bought'],h:'Irrégulier'},
+  {t:'Past Simple',q:'They ___ (not / go) to school.',b:["didn't go"],h:'Nég. passé'},
+  {t:'Past Simple',q:'___ you ___ (see) the film? (2 mots)',b:['Did','see'],h:'Interrog. passé'},
+  {t:'Past Simple',q:'I ___ (write) a letter yesterday.',b:['wrote'],h:'Irrégulier'},
+  // FUTURE WILL
+  {t:'Future – Will',q:'She ___ (help) you tomorrow.',b:['will help'],h:'will + infinitif'},
+  {t:'Future – Will',q:'I ___ (not / go) there.',b:["won't go"],h:'Nég. futur'},
+  {t:'Future – Will',q:'___ they ___ (come) tonight? (2 mots)',b:['Will','come'],h:'Interrog. futur'},
+  // GOING TO
+  {t:'Going To',q:'He ___ (go to / travel) next week.',b:['is going to travel'],h:'is going to + inf.'},
+  {t:'Going To',q:'We ___ (not / go to / buy) that.',b:["aren't going to buy"],h:'Nég. going to'},
+  // MODAUX CONJUGAISON
+  {t:'Modaux – Can',q:'She ___ speak three languages.',b:['can'],h:'Capacité au présent'},
+  {t:'Modaux – Can',q:'___ you help me, please?',b:['Can'],h:'Demande polie'},
+  {t:'Modaux – Should',q:'You ___ study more.',b:['should'],h:'Conseil'},
+  {t:'Modaux – Must',q:'You ___ not smoke here.',b:['must'],h:'Interdiction'},
+];
+
+let CONJS={i:0,res:[]};
+function buildConj(){CONJS={i:0,res:[]};renderConj();}
+function renderConj(){
+  const el=document.getElementById('sec-conj');
+  if(CONJS.i>=CONJD.length){
+    const ok=CONJS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=CONJD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${CONJD.length}</h2><p>${ok>=CONJD.length*.8?'Maîtrise parfaite !':'Revois les temps et réessaie !'}</p><button class="btn btn-primary" onclick="buildConj()">Recommencer</button></div>`;
+    return;
+  }
+  const d=CONJD[CONJS.i];
+  const ins=d.b.map((_,bi)=>`<input class="fill-in" id="ci${bi}" placeholder="..." style="max-width:200px;display:inline-block;margin-right:6px;" />`).join('');
+  el.innerHTML=`<div class="dots">${dots(CONJD,CONJS.i,CONJS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${CONJS.i+1} / ${CONJD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    ${ins}
+    <div style="margin-top:10px"><button class="btn" onclick="checkConj()" id="cbtn">Vérifier</button></div>
+    <div class="fb" id="cfb"></div>
+    <div class="nav" id="cnav"></div>
+  </div>`;
+}
+function checkConj(){
+  const d=CONJD[CONJS.i];
+  let ok=true;
+  d.b.forEach((b,bi)=>{
+    const inp=document.getElementById('ci'+bi);
+    if(inp.value.trim().toLowerCase()===b.toLowerCase()){
+      inp.style.borderColor='var(--green-bd)';inp.style.color='var(--green-tx)';
+    } else {
+      inp.style.borderColor='var(--red-bd)';inp.style.color='var(--red-tx)';ok=false;
+    }
+  });
+  const fb=document.getElementById('cfb');
+  fb.textContent=ok?'✓ Parfait !':'✗ Réponse(s) attendue(s) : '+d.b.join(' / ');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);CONJS.res[CONJS.i]=ok;
+  document.getElementById('cbtn').disabled=true;
+  document.getElementById('cnav').innerHTML=`<button class="btn btn-primary" onclick="CONJS.i++;renderConj()">${CONJS.i+1<CONJD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ======================== LACUNES ======================== */
+const LD=[
+  {t:'To Be',s:'___ am not late today.',b:['I'],h:'Pronom 1ère pers. sing.'},
+  {t:'To Be',s:'She ___ not happy.',b:['is'],h:'To Be / She'},
+  {t:'To Be',s:'___ you busy now ?',b:['Are'],h:'Forme interrogative'},
+  {t:'To Be',s:'They ___ not free.',b:['are'],h:'To Be / They'},
+  {t:'To Be',s:'___ he not tired ?',b:['Is'],h:'Interro-négatif / He'},
+  {t:'To Have',s:'He ___ a lot of friends.',b:['has'],h:'To Have / He'},
+  {t:'To Have',s:'They ___ not have time.',b:['do'],h:'Forme négative'},
+  {t:'To Have',s:'___ she got an idea ?',b:['Has'],h:'Forme interrogative / She'},
+  {t:'To Have',s:'I ___ not ___ a car.',b:['do','have'],h:'Forme négative (2 mots)'},
+  {t:'Beaucoup',s:'I can\'t eat ___ rice.',b:['much'],h:'Indénombrable'},
+  {t:'Beaucoup',s:'She speaks ___ languages.',b:['many'],h:'Dénombrable pluriel'},
+  {t:'Beaucoup',s:'___ ___ of people travel.',b:['A','lot'],h:'2 mots'},
+  {t:'WH Questions',s:'___ are you with ?',b:['Who'],h:'Question sur une personne'},
+  {t:'WH Questions',s:'___ is it ? (Où)',b:['Where'],h:'Lieu'},
+  {t:'WH Questions',s:'___ were you born ?',b:['When'],h:'Temps'},
+  {t:'WH Questions',s:'___ color do you prefer ?',b:['Which'],h:'Laquelle / lequel'},
+  {t:'Present Simple',s:'He ___ (like) chocolate.',b:['likes'],h:'+s à la 3ème pers.'},
+  {t:'Present Simple',s:'She ___ (not / eat) meat.',b:["doesn't eat"],h:'Nég. 3ème pers.'},
+  {t:'Present Continuous',s:'They ___ (play) football now.',b:['are playing'],h:'are + V-ing'},
+  {t:'Present Continuous',s:'She ___ (not / sleep).',b:["isn't sleeping"],h:'Nég. cont.'},
+  {t:'Past Simple',s:'He ___ (see) her yesterday.',b:['saw'],h:'Irrégulier'},
+  {t:'Past Simple',s:'We ___ (not / go) out.',b:["didn't go"],h:'Nég. passé'},
+  {t:'Future',s:'She ___ (call) you tomorrow.',b:['will call'],h:'will + inf.'},
+  {t:'Future',s:'They ___ (go to / leave) early.',b:['are going to leave'],h:'going to + inf.'},
+  {t:'Idiomes',s:'I am ___ of waiting.',b:['tired'],h:'To be tired of'},
+  {t:'Idiomes',s:'Are you ___ of pets ?',b:['afraid'],h:'To be afraid of'},
+  {t:'Vocabulaire',s:'___ she got time today ?',b:['Has'],h:'Interrogatif / She'},
+  {t:'Modaux',s:'You ___ see a doctor.',b:['should'],h:'Conseil'},
+  {t:'Modaux',s:'She ___ drive (she learned last year).',b:['can'],h:'Capacité'},
+  {t:'Modaux',s:'You ___ not park here.',b:['must'],h:'Interdiction'},
+];
+
+let LS={i:0,res:[]};
+function buildLac(){LS={i:0,res:[]};renderL();}
+function renderL(){
+  const el=document.getElementById('sec-lac');
+  if(LS.i>=LD.length){
+    const ok=LS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=LD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${LD.length}</h2><p>${ok>=LD.length*.8?'Excellent !':'Continue à t\'entraîner !'}</p><button class="btn btn-primary" onclick="buildLac()">Recommencer</button></div>`;
+    return;
+  }
+  const d=LD[LS.i];
+  const ins=d.b.map((_,bi)=>`<input class="fill-in" id="li${bi}" placeholder="..." style="max-width:200px;display:inline-block;margin-right:6px;" />`).join('');
+  el.innerHTML=`<div class="dots">${dots(LD,LS.i,LS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${LS.i+1} / ${LD.length}</div>
+    <div class="question">${esc(d.s)}</div>
+    <div class="hint">💡 ${esc(d.h)}</div>
+    ${ins}
+    <div style="margin-top:10px"><button class="btn" onclick="checkL()" id="lbtn">Vérifier</button></div>
+    <div class="fb" id="lfb"></div>
+    <div class="nav" id="lnav"></div>
+  </div>`;
+}
+function checkL(){
+  const d=LD[LS.i];
+  let ok=true;
+  d.b.forEach((b,bi)=>{
+    const inp=document.getElementById('li'+bi);
+    if(inp.value.trim().toLowerCase()===b.toLowerCase()){
+      inp.style.borderColor='var(--green-bd)';inp.style.color='var(--green-tx)';
+    } else {
+      inp.style.borderColor='var(--red-bd)';inp.style.color='var(--red-tx)';ok=false;
+    }
+  });
+  const fb=document.getElementById('lfb');
+  fb.textContent=ok?'✓ Parfait !':'✗ Réponse(s) attendue(s) : '+d.b.join(' / ');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);LS.res[LS.i]=ok;
+  document.getElementById('lbtn').disabled=true;
+  document.getElementById('lnav').innerHTML=`<button class="btn btn-primary" onclick="LS.i++;renderL()">${LS.i+1<LD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ======================== ASSOCIATION ======================== */
+const AD=[
+  {t:'Idiomes avec To Be',p:[
+    ['To be lucky','Avoir de la chance'],['To be sleepy','Avoir sommeil'],
+    ['To be in a rush','Être pressé'],['To be fed up with','En avoir marre de'],
+  ]},
+  {t:'To Have – expressions',p:[
+    ['To have mercy','Avoir pitié'],['To have manners','Avoir des manières'],
+    ['To have words','Avoir des mots'],['To have knowledge','Avoir des connaissances'],
+  ]},
+  {t:'Introduction',p:[
+    ['Nice to meet you!','Ravi de te rencontrer !'],
+    ['Let me introduce you to...','Laisse-moi te présenter...'],
+    ['I go by the name of...','Je suis connu sous le nom de...'],
+    ['May I present you to...','Puis-je vous présenter...'],
+  ]},
+  {t:'Vocabulaire divers',p:[
+    ['Afterwards','Ensuite / après'],['To swear','Jurer'],
+    ['What a mess!','Quel gâchis !'],['Fortnight','Quinze jours'],
+  ]},
+  {t:'Saisons & Météo',p:[
+    ['Summer','Été'],['Winter','Hiver'],
+    ['Rainy season','Saison des pluies'],['Heat wave','Canicule'],
+  ]},
+  {t:'Corps & émotions',p:[
+    ['To be ashamed','Avoir honte'],['To be afraid','Avoir peur'],
+    ['To be hungry','Avoir faim'],['To be thirsty','Avoir soif'],
+  ]},
+  {t:'Jours de la semaine',p:[
+    ['Monday','Lundi'],['Wednesday','Mercredi'],
+    ['Friday','Vendredi'],['Sunday','Dimanche'],
+  ]},
+  {t:'Mois de l\'année',p:[
+    ['January','Janvier'],['April','Avril'],
+    ['August','Août'],['November','Novembre'],
+  ]},
+  {t:'Famille',p:[
+    ['Mother','Mère'],['Brother','Frère'],
+    ['Grandmother','Grand-mère'],['Nephew','Neveu'],
+  ]},
+  {t:'Professions',p:[
+    ['Teacher','Enseignant(e)'],['Nurse','Infirmier/ière'],
+    ['Lawyer','Avocat(e)'],['Accountant','Comptable'],
+  ]},
+  {t:'Verbes irréguliers',p:[
+    ['Go → ?','Went'],['See → ?','Saw'],
+    ['Buy → ?','Bought'],['Write → ?','Wrote'],
+  ]},
+  {t:'Modaux',p:[
+    ['Can','Pouvoir / Savoir'],['Should','Devoir (conseil)'],
+    ['Must','Devoir (obligation)'],['May','Pouvoir (permission)'],
+  ]},
+];
+
+let AS={i:0,selL:null,selR:null,matched:[],res:[]};
+function buildAsso(){AS={i:0,selL:null,selR:null,matched:[],res:[]};renderA();}
+function renderA(){
+  const el=document.getElementById('sec-asso');
+  if(AS.i>=AD.length){
+    el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>Association terminée !</h2><p>Tous les groupes complétés.</p><button class="btn btn-primary" onclick="buildAsso()">Recommencer</button></div>`;
+    return;
+  }
+  const d=AD[AS.i];
+  const sr=[...d.p.map(p=>p[1])].sort(()=>Math.random()-.5);
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · Groupe ${AS.i+1} / ${AD.length}</div>
+    <div class="question">Relie chaque expression à sa traduction.</div>
+    <div class="match-cols" id="ml">${d.p.map((p,i)=>`<button class="m-item" id="ml${i}" onclick="selM('l',${i},'${p[0].replace(/'/g,"\\'")}')">${esc(p[0])}</button>`).join('')}</div>
+    <div class="match-sep"></div>
+    <div class="match-cols" id="mr">${sr.map((r,i)=>`<button class="m-item" id="mr${i}" onclick="selM('r',${i},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('')}</div>
+    <div class="fb" id="afb"></div>
+  </div>`;
+  AS.matched=[];AS.selL=null;AS.selR=null;
+}
+function selM(side,idx,val){
+  if(side==='l'){
+    document.querySelectorAll('#ml .m-item').forEach(b=>b.classList.remove('sel'));
+    document.getElementById('ml'+idx).classList.add('sel');
+    AS.selL={idx,val};
+  } else {
+    document.querySelectorAll('#mr .m-item').forEach(b=>b.classList.remove('sel'));
+    document.getElementById('mr'+idx).classList.add('sel');
+    AS.selR={idx,val};
+  }
+  if(AS.selL&&AS.selR){
+    const d=AD[AS.i];
+    const pair=d.p.find(p=>p[0]===AS.selL.val);
+    const ok=pair&&pair[1]===AS.selR.val;
+    const lel=document.querySelector('#ml .sel');
+    const rel=document.querySelector('#mr .sel');
+    if(ok){
+      if(lel)lel.classList.replace('sel','m-ok');
+      if(rel)rel.classList.replace('sel','m-ok');
+      AS.matched.push(AS.selL.val);
+      score(true);
+      if(AS.matched.length===d.p.length){setTimeout(()=>{AS.i++;renderA();},500);}
+    } else {
+      if(lel){lel.classList.add('m-ko');setTimeout(()=>lel.classList.remove('sel','m-ko'),500);}
+      if(rel){rel.classList.add('m-ko');setTimeout(()=>rel.classList.remove('sel','m-ko'),500);}
+      score(false);
+    }
+    AS.selL=null;AS.selR=null;
+  }
+}
+
+/* ======================== DATES & TEMPS ======================== */
+const DATEREF=`
+<b>Jours :</b> Monday · Tuesday · Wednesday · Thursday · Friday · Saturday · Sunday<br>
+<b>Mois :</b> January · February · March · April · May · June · July · August · September · October · November · December<br>
+<b>Ordinals :</b> 1st · 2nd · 3rd · 4th · 5th … 11th · 12th · 13th … 21st · 22nd · 23rd …<br>
+<b>Format date :</b> April 3rd, 2026 — The 3rd of April, 2026
+`;
+
+const DATED=[
+  {t:'Jours',q:'Comment dit-on "mercredi" en anglais ?',o:['Monday','Wednesday','Thursday','Saturday'],a:1},
+  {t:'Jours',q:'Quel jour vient après "Thursday" ?',o:['Wednesday','Saturday','Friday','Sunday'],a:2},
+  {t:'Jours',q:'"The weekend" correspond à :',o:['Lun. & Mar.','Jeu. & Ven.','Sam. & Dim.','Mer. & Jeu.'],a:2},
+  {t:'Mois',q:'Comment dit-on "août" en anglais ?',o:['July','June','August','October'],a:2},
+  {t:'Mois',q:'Quel est le 3ème mois de l\'année ?',o:['February','March','April','January'],a:1},
+  {t:'Mois',q:'"November" est le ___ mois :',o:['9ème','10ème','11ème','12ème'],a:2},
+  {t:'Ordinaux',q:'Comment écrit-on le numéro ordinal de 1 ?',o:['1nd','1st','1th','1rd'],a:1},
+  {t:'Ordinaux',q:'Comment écrit-on le numéro ordinal de 3 ?',o:['3st','3nd','3th','3rd'],a:3},
+  {t:'Ordinaux',q:'Comment écrit-on le numéro ordinal de 22 ?',o:['22th','22rd','22nd','22st'],a:2},
+  {t:'Lire une date',q:'"April 3rd, 2026" se lit :',o:['The third of April, twenty twenty-six','April three, two thousand twenty-six','Third April, two-zero-two-six','The three of April, twenty-six'],a:0},
+  {t:'Lire une date',q:'"January 1st" c\'est :',o:['Le premier février','Le premier janvier','Le onze janvier','Le un janvier'],a:1},
+  {t:'Saisons',q:'Quelle saison suit "autumn" ?',o:['Spring','Summer','Winter','Rainy season'],a:2},
+  {t:'Heure',q:'"It\'s half past two" signifie :',o:['2h00','2h15','2h30','2h45'],a:2},
+  {t:'Heure',q:'"It\'s quarter to five" signifie :',o:['5h15','4h45','5h00','4h30'],a:1},
+  {t:'Heure',q:'"It\'s noon" signifie :',o:['Minuit','Il est midi','Il est 11h','Il est 13h'],a:1},
+  {t:'Heure',q:'"What time is it?" signifie :',o:['À quelle heure ?','Quelle heure est-il ?','Depuis quand ?','Quand arrives-tu ?'],a:1},
+  {t:'Durée',q:'"Fortnight" signifie :',o:['une semaine','15 jours','un mois','un trimestre'],a:1},
+  {t:'Durée',q:'"A decade" signifie :',o:['un an','5 ans','10 ans','100 ans'],a:2},
+  {t:'Durée',q:'"A century" signifie :',o:['10 ans','50 ans','100 ans','1000 ans'],a:2},
+  {t:'Prépositions de temps',q:'On utilise ___ avec les jours de la semaine :',o:['in','on','at','by'],a:1},
+  {t:'Prépositions de temps',q:'On utilise ___ avec les mois et années :',o:['on','at','in','by'],a:2},
+  {t:'Prépositions de temps',q:'On utilise ___ avec l\'heure précise :',o:['in','on','at','for'],a:2},
+];
+
+let DS2={i:0,res:[]};
+function buildDates(){DS2={i:0,res:[]};renderDate();}
+function renderDate(){
+  const el=document.getElementById('sec-dates');
+  if(DS2.i>=DATED.length){
+    const ok=DS2.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=DATED.length*.8?'🏆':'📚'}</div><h2>${ok} / ${DATED.length}</h2><p>${ok>=DATED.length*.8?'Parfait !':'Revois le calendrier !'}</p><button class="btn btn-primary" onclick="buildDates()">Recommencer</button></div>`;
+    return;
+  }
+  const d=DATED[DS2.i];
+  el.innerHTML=`
+  <div class="sec-intro">${DATEREF}</div>
+  <div class="dots">${dots(DATED,DS2.i,DS2.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${DS2.i+1} / ${DATED.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansDate(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="dfb2"></div>
+    <div class="nav" id="dnav2"></div>
+  </div>`;
+}
+function ansDate(i){
+  const d=DATED[DS2.i];
+  document.querySelectorAll('#sec-dates .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-dates .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('dfb2');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Bonne réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);DS2.res[DS2.i]=ok;
+  document.getElementById('dnav2').innerHTML=`<button class="btn btn-primary" onclick="DS2.i++;renderDate()">${DS2.i+1<DATED.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ======================== NOMBRES ======================== */
+const NOMBREF=`
+<b>Cardinaux :</b> one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred, one thousand, one million<br>
+<b>Ordinaux :</b> first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth…
+`;
+
+const NOMBED=[
+  {t:'Nombres cardinaux',q:'Comment dit-on "15" en anglais ?',o:['Fifty','Fifteen','Fiveteen','Fifty-one'],a:1},
+  {t:'Nombres cardinaux',q:'Comment dit-on "80" ?',o:['Eighteen','Eight','Eighty','Eight hundred'],a:2},
+  {t:'Nombres cardinaux',q:'"One hundred and twenty-five" correspond à :',o:['1025','125','12500','1250'],a:1},
+  {t:'Nombres cardinaux',q:'Comment dit-on "13" ?',o:['Thirty','Thirteen','Three teen','Thirteen hundred'],a:1},
+  {t:'Nombres cardinaux',q:'Comment dit-on "1 000 000" ?',o:['One billion','One thousand','One hundred thousand','One million'],a:3},
+  {t:'Nombres cardinaux',q:'"Forty-seven" correspond à :',o:['74','47','407','4700'],a:1},
+  {t:'Ordinaux',q:'Comment dit-on "premier" ?',o:['Oneth','Firstly','First','One'],a:2},
+  {t:'Ordinaux',q:'Comment dit-on "deuxième" ?',o:['Second','Secondly','Twoth','Two'],a:0},
+  {t:'Ordinaux',q:'Comment dit-on "cinquième" ?',o:['Fiveth','Fifthy','Fifth','Fift'],a:2},
+  {t:'Ordinaux',q:'Comment dit-on "douzième" ?',o:['Twelveth','Twelvth','Twelfth','Twelth'],a:2},
+  {t:'Nombres – opérations',q:'"Two plus three equals ___"',o:['four','five','six','seven'],a:1},
+  {t:'Nombres – opérations',q:'"Ten minus four equals ___"',o:['five','seven','six','eight'],a:2},
+  {t:'Prix & argent',q:'Comment dit-on "$5.99" à voix haute ?',o:['Five and ninety-nine','Five dollars ninety-nine','Five point ninety-nine dollars','Five ninety-nine dollars'],a:1},
+  {t:'Téléphone',q:'Le numéro "007" se lit :',o:['zero zero seven','oh oh seven','double zero seven','Tout est correct'],a:3},
+  {t:'Fractions',q:'"Half" correspond à :',o:['1/3','1/4','1/2','3/4'],a:2},
+  {t:'Fractions',q:'"A quarter" correspond à :',o:['1/2','1/4','1/3','3/4'],a:1},
+];
+
+let NS={i:0,res:[]};
+function buildNombres(){NS={i:0,res:[]};renderNombre();}
+function renderNombre(){
+  const el=document.getElementById('sec-nombres');
+  if(NS.i>=NOMBED.length){
+    const ok=NS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=NOMBED.length*.8?'🏆':'📚'}</div><h2>${ok} / ${NOMBED.length}</h2><p>${ok>=NOMBED.length*.8?'Parfait !':'Revois les nombres !'}</p><button class="btn btn-primary" onclick="buildNombres()">Recommencer</button></div>`;
+    return;
+  }
+  const d=NOMBED[NS.i];
+  el.innerHTML=`
+  <div class="sec-intro">${NOMBREF}</div>
+  <div class="dots">${dots(NOMBED,NS.i,NS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${NS.i+1} / ${NOMBED.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansNombre(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="nfb"></div>
+    <div class="nav" id="nnav"></div>
+  </div>`;
+}
+function ansNombre(i){
+  const d=NOMBED[NS.i];
+  document.querySelectorAll('#sec-nombres .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-nombres .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('nfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Bonne réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);NS.res[NS.i]=ok;
+  document.getElementById('nnav').innerHTML=`<button class="btn btn-primary" onclick="NS.i++;renderNombre()">${NS.i+1<NOMBED.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ======================== TRADUCTION ======================== */
+const TD=[
+  {t:'To Be',fr:'Je ne suis pas en retard.',en:'I am not late.'},
+  {t:'To Be',fr:'Êtes-vous fatigué ?',en:'Are you tired?'},
+  {t:'To Be',fr:'Ils ne sont pas libres ce soir.',en:'They are not free tonight.'},
+  {t:'To Be',fr:'Pourquoi es-tu pressé ?',en:'Why are you in a rush?'},
+  {t:'To Have',fr:'A-t-il une idée ?',en:'Has he got an idea?'},
+  {t:'To Have',fr:'Elle n\'a pas de temps.',en:'She does not have time.'},
+  {t:'To Have',fr:'Nous avons beaucoup de choses à faire.',en:'We have a lot of things to do.'},
+  {t:'Present Simple',fr:'Il mange du riz tous les jours.',en:'He eats rice every day.'},
+  {t:'Present Simple',fr:'Est-ce qu\'elle parle anglais ?',en:'Does she speak English?'},
+  {t:'Present Continuous',fr:'Ils jouent au football maintenant.',en:'They are playing football now.'},
+  {t:'Present Continuous',fr:'Je ne dors pas.',en:'I am not sleeping.'},
+  {t:'Past Simple',fr:'Elle a visité Paris l\'an dernier.',en:'She visited Paris last year.'},
+  {t:'Past Simple',fr:'Il n\'est pas allé à l\'école.',en:'He didn\'t go to school.'},
+  {t:'Future',fr:'Je t\'appellerai demain.',en:'I will call you tomorrow.'},
+  {t:'Future',fr:'Nous allons partir tôt.',en:'We are going to leave early.'},
+  {t:'Beaucoup',fr:'Il y a beaucoup de monde ici.',en:"There are a lot of people here."},
+  {t:'Beaucoup',fr:'Ma femme a beaucoup de choses à faire.',en:'My wife has many things to do.'},
+  {t:'WH Questions',fr:'Qui frappe à la porte ?',en:"Who's knocking at the door?"},
+  {t:'WH Questions',fr:'Laquelle des couleurs aimes-tu ?',en:'Which color do you like?'},
+  {t:'Introduction',fr:'Je voudrais vous présenter mon ami Diallo.',en:'I would like you to meet my friend Diallo.'},
+  {t:'Idiomes',fr:'J\'en ai marre de la chaleur.',en:'I am fed up with the heat.'},
+  {t:'Idiomes',fr:'Il avait raison et elle avait tort.',en:'He was right and she was wrong.'},
+  {t:'Idiomes',fr:'J\'ai soif et j\'ai aussi faim.',en:'I am thirsty and I am also hungry.'},
+  {t:'Modaux',fr:'Tu devrais voir un médecin.',en:'You should see a doctor.'},
+  {t:'Modaux',fr:'Elle sait conduire.',en:'She can drive.'},
+  {t:'Modaux',fr:'Tu ne dois pas fumer ici.',en:'You must not smoke here.'},
+  {t:'Dates',fr:'Le lundi 3 avril 2026.',en:'Monday, April 3rd, 2026.'},
+  {t:'Nombres',fr:'Il y a cent vingt-cinq élèves.',en:'There are one hundred and twenty-five students.'},
+  {t:'Vocabulaire',fr:'Où étais-tu hier soir ?',en:'Where were you last night?'},
+  {t:'Vocabulaire',fr:'Il y a un embouteillage sur la route.',en:'There is a traffic jam on the road.'},
+];
+
+let TS={i:0,res:[]};
+function buildTrad(){TS={i:0,res:[]};renderT();}
+function renderT(){
+  const el=document.getElementById('sec-trad');
+  if(TS.i>=TD.length){
+    const ok=TS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=TD.length*.7?'🏆':'📚'}</div><h2>${ok} / ${TD.length} correctes</h2><p>${ok>=TD.length*.7?'Très bien !':'Relis tes cours et réessaie !'}</p><button class="btn btn-primary" onclick="buildTrad()">Recommencer</button></div>`;
+    return;
+  }
+  const d=TD[TS.i];
+  el.innerHTML=`<div class="dots">${dots(TD,TS.i,TS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${TS.i+1} / ${TD.length}</div>
+    <div class="question">Traduire en anglais :<br><em>${esc(d.fr)}</em></div>
+    <textarea class="fill-in" id="tin" rows="2" placeholder="Votre traduction..."></textarea>
+    <button class="btn" id="tbtn" onclick="checkT()">Vérifier / Voir la réponse</button>
+    <div class="fb" id="tfb"></div>
+    <div class="nav" id="tnav"></div>
+  </div>`;
+}
+function checkT(){
+  const d=TD[TS.i];
+  const val=document.getElementById('tin').value.trim().toLowerCase();
+  const exp=d.en.toLowerCase();
+  const words=exp.split(/\s+/);
+  const uwords=val.split(/\s+/).map(w=>w.replace(/[?.!,]/g,''));
+  const matches=words.filter(w=>uwords.includes(w.replace(/[?.!,]/g,''))).length;
+  const ok=matches>=Math.floor(words.length*0.65);
+  const fb=document.getElementById('tfb');
+  fb.innerHTML='Réponse attendue : <strong>'+esc(d.en)+'</strong><br>'+(ok?'✓ Très bien !':'✗ Regardez la correction ci-dessus.');
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);TS.res[TS.i]=ok;
+  document.getElementById('tbtn').disabled=true;
+  document.getElementById('tin').disabled=true;
+  document.getElementById('tnav').innerHTML=`<button class="btn btn-primary" onclick="TS.i++;renderT()">${TS.i+1<TD.length?'Suivant →':'Résultat →'}</button>`;
+}
+
+/* ======================== DIALOGUE ======================== */
+const DD=[
+  {t:'WH Questions',bank:['happening','restrooms','coming','crowded','Why'],
+   lines:[
+    {sp:'DIALLO',txt:"It's ___!",key:'crowded'},
+    {sp:'BEN',txt:"Yes, what's ___ here?",key:'happening'},
+    {sp:'DIALLO',txt:"Where are the ___?",key:'restrooms'},
+    {sp:'BEN',txt:"When are you ___ back?",key:'coming'},
+    {sp:'DIALLO',txt:"Gimme 5 min.",key:null},
+    {sp:'BEN',txt:"___ not!",key:'Why'},
+  ]},
+  {t:'To Have',bank:['time','impediment','appointment','full day','busy'],
+   lines:[
+    {sp:'EMMA',txt:"Diallo, do you have ___ tonight?",key:'time'},
+    {sp:'DIALLO',txt:"I have an ___ tonight.",key:'impediment'},
+    {sp:'EMMA',txt:"Do you have an ___?",key:'appointment'},
+    {sp:'DIALLO',txt:"Tomorrow I have a ___.",key:'full day'},
+    {sp:'EMMA',txt:"You are all the time ___.",key:'busy'},
+  ]},
+  {t:'To Be',bank:['rush','free','late','ready','sorry'],
+   lines:[
+    {sp:'BEN',txt:"Emma, why are you in a ___?",key:'rush'},
+    {sp:'EMMA',txt:"I think on Saturdays you are often ___.",key:'free'},
+    {sp:'BEN',txt:"Are you on time or ___?",key:'late'},
+    {sp:'EMMA',txt:"Now, I'm getting ___ for the meeting.",key:'ready'},
+    {sp:'BEN',txt:"I'm ___ for you.",key:'sorry'},
+  ]},
+  {t:'Introduction',bank:['scarce','brother','engineer','pleasure','busy'],
+   lines:[
+    {sp:'DIALLO',txt:"Ben, you are getting ___ now.",key:'scarce'},
+    {sp:'BEN',txt:"These days, I'm very ___.",key:'busy'},
+    {sp:'BEN',txt:"This is my ___ Abdou.",key:'brother'},
+    {sp:'ABDOU',txt:"It's a ___ to meet you!",key:'pleasure'},
+    {sp:'DIALLO',txt:"I'm an ___ in electricity.",key:'engineer'},
+  ]},
+  {t:'Present Simple – Au restaurant',bank:['order','recommend','prefer','menu','available'],
+   lines:[
+    {sp:'WAITER',txt:"Here is the ___.",key:'menu'},
+    {sp:'DIALLO',txt:"What do you ___?",key:'recommend'},
+    {sp:'WAITER',txt:"The chicken is very ___.",key:'available'},
+    {sp:'DIALLO',txt:"I ___ fish actually.",key:'prefer'},
+    {sp:'WAITER',txt:"Would you like to ___ now?",key:'order'},
+  ]},
+  {t:'Au travail',bank:['meeting','deadline','report','urgent','schedule'],
+   lines:[
+    {sp:'BOSS',txt:"We have a ___ at 10am.",key:'meeting'},
+    {sp:'EMMA',txt:"I'll send you the ___ by then.",key:'report'},
+    {sp:'BOSS',txt:"The ___ is tomorrow.",key:'deadline'},
+    {sp:'EMMA',txt:"Is it ___?",key:'urgent'},
+    {sp:'BOSS',txt:"Check your ___ please.",key:'schedule'},
+  ]},
+];
+
+let DIAGS={i:0,sel:null,filled:{},res:[]};
+function buildDiag(){DIAGS={i:0,sel:null,filled:{},res:[]};renderDiag();}
+function renderDiag(){
+  const el=document.getElementById('sec-diag');
+  if(DIAGS.i>=DD.length){
+    el.innerHTML=`<div class="card congrats"><div class="emoji">🏆</div><h2>Dialogues terminés !</h2><p>Bravo, tous les dialogues complétés !</p><button class="btn btn-primary" onclick="buildDiag()">Recommencer</button></div>`;
+    return;
+  }
+  const d=DD[DIAGS.i];
+  const chips=d.bank.map((w,wi)=>`<button class="chip" id="ch${wi}" onclick="pickChip('${w.replace(/'/g,"\\'")}',${wi})">${esc(w)}</button>`).join('');
+  const lines=d.lines.map((l,li)=>{
+    if(!l.key) return `<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${esc(l.txt)}</div>`;
+    return `<div class="diag-line"><strong>${esc(l.sp)} :</strong> ${l.txt.replace('___',`<span class="blank" id="bl${li}" data-key="${esc(l.key)}" onclick="fillBlank(${li})">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`)}</div>`;
+  }).join('');
+  el.innerHTML=`<div class="card">
+    <div class="card-tag">${esc(d.t)} · Dialogue ${DIAGS.i+1} / ${DD.length}</div>
+    <div class="question">Sélectionne un mot puis clique sur un blanc.</div>
+    <div class="bank">${chips}</div>
+    <div id="dlines">${lines}</div>
+    <div style="margin-top:12px"><button class="btn" id="dbtn" onclick="checkDiag()">Vérifier</button></div>
+    <div class="fb" id="diafb"></div>
+    <div class="nav" id="dianav"></div>
+  </div>`;
+  DIAGS.sel=null;DIAGS.filled={};
+}
+function pickChip(word,wi){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+  document.getElementById('ch'+wi).classList.add('sel-chip');
+  DIAGS.sel={word,wi};
+}
+function fillBlank(li){
+  if(!DIAGS.sel) return;
+  const b=document.getElementById('bl'+li);
+  if(DIAGS.filled[li]){document.getElementById('ch'+DIAGS.filled[li].wi).classList.remove('used');}
+  DIAGS.filled[li]=DIAGS.sel;
+  b.textContent=DIAGS.sel.word;
+  document.getElementById('ch'+DIAGS.sel.wi).classList.add('used');
+  document.getElementById('ch'+DIAGS.sel.wi).classList.remove('sel-chip');
+  DIAGS.sel=null;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-chip'));
+}
+function checkDiag(){
+  const d=DD[DIAGS.i];
+  let ok=0,tot=0;
+  d.lines.forEach((l,li)=>{
+    if(!l.key) return;
+    tot++;
+    const b=document.getElementById('bl'+li);
+    if(DIAGS.filled[li]&&DIAGS.filled[li].word.toLowerCase()===l.key.toLowerCase()){
+      b.classList.add('b-ok');ok++;
+    } else {
+      b.classList.add('b-ko');b.textContent=l.key;
+    }
+  });
+  const allOk=ok===tot;
+  score(allOk);DIAGS.res[DIAGS.i]=allOk;
+  const fb=document.getElementById('diafb');
+  fb.textContent=allOk?'✓ Parfait !':'✗ '+ok+'/'+tot+' — Corrections en vert.';
+  fb.className='fb '+(allOk?'ok':'ko');
+  document.getElementById('dbtn').disabled=true;
+  document.getElementById('dianav').innerHTML=`<button class="btn btn-primary" onclick="DIAGS.i++;renderDiag()">${DIAGS.i+1<DD.length?'Dialogue suivant →':'Résultat →'}</button>`;
+}
+
+/* ======================== VOCABULAIRE ======================== */
+const VOCD=[
+  // FAMILLE
+  {t:'Famille',q:'"Nephew" signifie :',o:['Nièce','Neveu','Cousin','Oncle'],a:1},
+  {t:'Famille',q:'"Mother-in-law" signifie :',o:['Belle-sœur','Belle-fille','Belle-mère','Tante'],a:2},
+  {t:'Famille',q:'"Siblings" signifie :',o:['Parents','Frères et sœurs','Amis','Enfants'],a:1},
+  {t:'Famille',q:'"Twins" signifie :',o:['Triplés','Jumeaux','Aînés','Cousins'],a:1},
+  // CORPS
+  {t:'Corps humain',q:'"Knee" signifie :',o:['Cheville','Poignet','Genou','Coude'],a:2},
+  {t:'Corps humain',q:'"Shoulder" signifie :',o:['Epaule','Poitrine','Dos','Hanche'],a:0},
+  {t:'Corps humain',q:'"Thumb" signifie :',o:['Index','Annulaire','Auriculaire','Pouce'],a:3},
+  // COULEURS
+  {t:'Couleurs',q:'"Purple" signifie :',o:['Rose','Violet','Bordeaux','Bleu marine'],a:1},
+  {t:'Couleurs',q:'"Beige" signifie :',o:['Brun','Crème/beige','Orange pâle','Gris'],a:1},
+  {t:'Couleurs',q:'"Teal" signifie :',o:['Turquoise/sarcelle','Vert citron','Bordeaux','Magenta'],a:0},
+  // MAISON
+  {t:'Maison',q:'"Ceiling" signifie :',o:['Plancher','Mur','Plafond','Toit'],a:2},
+  {t:'Maison',q:'"Stairs" signifie :',o:['Couloir','Escaliers','Ascenseur','Porte'],a:1},
+  {t:'Maison',q:'"Sink" signifie :',o:['Douche','Baignoire','Lavabo/évier','Robinet'],a:2},
+  // LIEUX
+  {t:'Lieux',q:'"Embassy" signifie :',o:['Hôpital','Ambassade','Mairie','Tribunal'],a:1},
+  {t:'Lieux',q:'"Pharmacy" signifie :',o:['Librairie','Pharmacie','Épicerie','Boulangerie'],a:1},
+  {t:'Lieux',q:'"Courthouse" signifie :',o:['Palais des sports','Tribunal','Hôtel de ville','Commissariat'],a:1},
+  // NOURRITURE
+  {t:'Nourriture',q:'"Seafood" signifie :',o:['Légumes de mer','Fruits de mer','Algues','Poisson fumé'],a:1},
+  {t:'Nourriture',q:'"Stew" signifie :',o:['Grillé','Ragoût','Salade','Smoothie'],a:1},
+  {t:'Nourriture',q:'"Leftovers" signifie :',o:['Restes de repas','Entrées','Desserts','Condiments'],a:0},
+  // METEO
+  {t:'Météo',q:'"Drought" signifie :',o:['Orage','Sécheresse','Grêle','Brouillard'],a:1},
+  {t:'Météo',q:'"Lightning" signifie :',o:['Tonnerre','Foudre / éclair','Averse','Tornade'],a:1},
+  {t:'Météo',q:'"Overcast" signifie :',o:['Ensoleillé','Nuageux / couvert','Brumeux','Venteux'],a:1},
+  // TRANSPORTS
+  {t:'Transports',q:'"Fare" signifie :',o:['Itinéraire','Arrêt','Tarif / prix du billet','Retard'],a:2},
+  {t:'Transports',q:'"Roundabout" signifie :',o:['Autoroute','Rond-point','Passage clouté','Carrefour'],a:1},
+  {t:'Transports',q:'"Toll" signifie :',o:['Péage','Panneau','Feu rouge','Détour'],a:0},
+  // EMOTIONS
+  {t:'Émotions',q:'"Overwhelmed" signifie :',o:['Indifférent','Dépassé / submergé','Enthousiaste','Gêné'],a:1},
+  {t:'Émotions',q:'"Relieved" signifie :',o:['Inquiet','Soulagé','Jaloux','Confus'],a:1},
+  {t:'Émotions',q:'"Grateful" signifie :',o:['Méfiant','Reconnaissant','Curieux','Nerveux'],a:1},
+  // TRAVAIL
+  {t:'Travail',q:'"Deadline" signifie :',o:['Réunion','Date limite','Contrat','Fiche de paie'],a:1},
+  {t:'Travail',q:'"Colleague" signifie :',o:['Supérieur','Subordonné','Collègue','Client'],a:2},
+  {t:'Travail',q:'"Wage" signifie :',o:['Congé','Promotion','Salaire','Poste'],a:2},
+];
+
+let VS={i:0,res:[]};
+function buildVoc(){VS={i:0,res:[]};renderVoc();}
+function renderVoc(){
+  const el=document.getElementById('sec-voc');
+  if(VS.i>=VOCD.length){
+    const ok=VS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=VOCD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${VOCD.length}</h2><p>${ok>=VOCD.length*.8?'Vocabulaire maîtrisé !':'Continue à apprendre !'}</p><button class="btn btn-primary" onclick="buildVoc()">Recommencer</button></div>`;
+    return;
+  }
+  const d=VOCD[VS.i];
+  el.innerHTML=`<div class="dots">${dots(VOCD,VS.i,VS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${VS.i+1} / ${VOCD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansVoc(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="vfb"></div>
+    <div class="nav" id="vnav"></div>
+  </div>`;
+}
+function ansVoc(i){
+  const d=VOCD[VS.i];
+  document.querySelectorAll('#sec-voc .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-voc .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('vfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Bonne réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);VS.res[VS.i]=ok;
+  document.getElementById('vnav').innerHTML=`<button class="btn btn-primary" onclick="VS.i++;renderVoc()">${VS.i+1<VOCD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* ======================== MODAUX ======================== */
+const MODALD=[
+  {t:'Can – Capacité',q:'Lequel exprime une capacité ?',o:['You must come.','She can swim.','He should rest.','They may leave.'],a:1},
+  {t:'Can – Permission',q:'Comment demande-t-on poliment la permission ?',o:['I can go?','Can I go, please?','I must go?','I should go?'],a:1},
+  {t:'Could',q:'"Could you help me?" exprime :',o:['une obligation','une capacité passée','une demande polie','une interdiction'],a:2},
+  {t:'Could',q:'"She could run fast when she was young." Sens ?',o:['Elle doit courir vite','Elle pouvait courir vite','Elle peut courir vite','Elle devrait courir'],a:1},
+  {t:'Should',q:'On utilise "should" pour :',o:['une interdiction forte','un conseil / recommandation','une obligation légale','une permission'],a:1},
+  {t:'Should',q:'Phrase correcte :',o:['You should to rest.','You should resting.','You should rest.','You should rests.'],a:2},
+  {t:'Must',q:'"You must wear a seatbelt." Sens ?',o:['Tu devrais porter une ceinture','Tu peux porter une ceinture','Tu dois porter une ceinture','Tu porteras une ceinture'],a:2},
+  {t:'Must not',q:'"You must not smoke here." Sens ?',o:['Tu ne devrais pas fumer','Il est inutile de fumer','Tu n\'es pas obligé de fumer','Il est interdit de fumer'],a:3},
+  {t:'Have to',q:'"I have to work tomorrow." Sens ?',o:['Je veux travailler','Je dois travailler','Je peux travailler','Je vais travailler'],a:1},
+  {t:'Don\'t have to',q:'"You don\'t have to come." Sens ?',o:['Tu ne peux pas venir','Il est interdit de venir','Tu n\'es pas obligé de venir','Tu ne devrais pas venir'],a:2},
+  {t:'May',q:'On utilise "may" pour :',o:['une obligation','une interdiction','une capacité physique','une permission / possibilité'],a:3},
+  {t:'Might',q:'"It might rain." Sens ?',o:['Il pleut sûrement','Il ne pleuvra pas','Il pourrait pleuvoir','Il a plu'],a:2},
+  {t:'Would',q:'"Would you like some tea?" est :',o:['une obligation','une offre polie','une interdiction','une capacité'],a:1},
+  {t:'Would',q:'"I would love to come!" — "would" exprime :',o:['une certitude','un désir / souhait','une interdiction','une capacité'],a:1},
+  {t:'Récap modaux',q:'Quel modal exprime une interdiction forte ?',o:['Should not','Could not','Must not','Might not'],a:2},
+  {t:'Récap modaux',q:'Quel modal exprime un conseil ?',o:['Must','Can','Should','Will'],a:2},
+  {t:'Récap modaux',q:'Quel modal exprime une capacité ?',o:['Must','Should','Can','Would'],a:2},
+  {t:'Récap modaux',q:'"Needn\'t" est équivalent à :',o:['Must not','Don\'t have to','Shouldn\'t','Can\'t'],a:1},
+];
+
+let MS={i:0,res:[]};
+function buildModal(){MS={i:0,res:[]};renderModal();}
+function renderModal(){
+  const el=document.getElementById('sec-modal');
+  if(MS.i>=MODALD.length){
+    const ok=MS.res.filter(r=>r).length;
+    el.innerHTML=`<div class="card congrats"><div class="emoji">${ok>=MODALD.length*.8?'🏆':'📚'}</div><h2>${ok} / ${MODALD.length}</h2><p>${ok>=MODALD.length*.8?'Modaux maîtrisés !':'Revois les modaux !'}</p><button class="btn btn-primary" onclick="buildModal()">Recommencer</button></div>`;
+    return;
+  }
+  const d=MODALD[MS.i];
+  const ref=`<div class="sec-intro"><b>Rappel modaux :</b> can (capacité/permission) · could (passé/politesse) · should (conseil) · must (obligation) · must not (interdiction) · may/might (possibilité) · would (politesse/souhait) · have to (obligation externe) · don't have to (pas obligatoire)</div>`;
+  el.innerHTML=`${ref}<div class="dots">${dots(MODALD,MS.i,MS.res)}</div>
+  <div class="card">
+    <div class="card-tag">${esc(d.t)} · ${MS.i+1} / ${MODALD.length}</div>
+    <div class="question">${esc(d.q)}</div>
+    <div class="options">${d.o.map((o,i)=>`<button class="option" onclick="ansModal(${i})">${esc(o)}</button>`).join('')}</div>
+    <div class="fb" id="mfb"></div>
+    <div class="nav" id="mnav"></div>
+  </div>`;
+}
+function ansModal(i){
+  const d=MODALD[MS.i];
+  document.querySelectorAll('#sec-modal .option').forEach(b=>{b.onclick=null;b.classList.add('locked');});
+  const opts=document.querySelectorAll('#sec-modal .option');
+  const ok=i===d.a;
+  opts[i].classList.add(ok?'correct':'wrong');
+  if(!ok) opts[d.a].classList.add('reveal');
+  const fb=document.getElementById('mfb');
+  fb.textContent=ok?'✓ Bonne réponse !':'✗ Bonne réponse : "'+d.o[d.a]+'"';
+  fb.className='fb '+(ok?'ok':'ko');
+  score(ok);MS.res[MS.i]=ok;
+  document.getElementById('mnav').innerHTML=`<button class="btn btn-primary" onclick="MS.i++;renderModal()">${MS.i+1<MODALD.length?'Suivante →':'Résultat →'}</button>`;
+}
+
+/* INIT */
+buildQCM();buildConj();buildLac();buildAsso();buildDates();buildNombres();buildTrad();buildDiag();buildVoc();buildModal();
+</script>
+</body>
+</html>
