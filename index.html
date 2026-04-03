@@ -1,3 +1,9 @@
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
+
 <a href="revision.html" style="
   position:fixed;bottom:20px;right:16px;z-index:999;
   background:#1a4a8a;color:#fff;
