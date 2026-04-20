@@ -2,118 +2,48 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>English Learning</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="refresh" content="0; url=app.html">
+  <title>CTI English — Redirection…</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'DM Sans', sans-serif;
-      background: #f5f7fb;
-      color: #222;
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:system-ui,sans-serif;
+      background:linear-gradient(135deg,#1a3a6a,#1a6a4a);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      color:#fff;text-align:center;padding:24px;
     }
-
-    header {
-      background: linear-gradient(135deg, #1a4a8a, #2980b9);
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
+    .wrap{max-width:340px}
+    .icon{font-size:3.5rem;margin-bottom:16px;display:block}
+    h1{font-size:1.4rem;font-weight:800;margin-bottom:8px}
+    p{font-size:.9rem;opacity:.85;margin-bottom:24px;line-height:1.5}
+    a{
+      display:inline-block;padding:14px 32px;
+      background:#fff;color:#1a3a6a;
+      border-radius:30px;font-weight:700;font-size:1rem;
+      text-decoration:none;box-shadow:0 4px 20px rgba(0,0,0,.25);
     }
-
-    header h1 {
-      margin: 0;
-      font-size: 32px;
-    }
-
-    header p {
-      margin-top: 10px;
-      opacity: 0.9;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
-
-    .card h2 {
-      margin-top: 0;
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 8px;
-      background: #1a4a8a;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-
-    .btn:hover {
-      background: #163d70;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
-      color: #777;
-    }
+    .sub{margin-top:16px;font-size:.78rem;opacity:.65}
+    .sub a{background:none;color:#fff;box-shadow:none;padding:4px 8px;font-weight:500;font-size:.78rem}
   </style>
 </head>
-
 <body>
-
-<header>
-  <h1>📘 English Learning</h1>
-  <p>Apprends l’anglais facilement et rapidement</p>
-</header>
-
-<div class="container">
-
-  <div class="card">
-    <h2>📖 Révision</h2>
-    <p>Accède aux exercices et révise ton anglais.</p>
-    <a href="revision.html" class="btn">Commencer</a>
+  <div class="wrap">
+    <span class="icon">📘</span>
+    <h1>CTI English PWA</h1>
+    <p>Révision adaptative d'anglais<br>pour les apprenants CTI — Dakar</p>
+    <a href="app.html">Ouvrir l'application →</a>
+    <div class="sub">
+      Ancienne version :
+      <a href="revision.html">révision classique</a> &nbsp;|&nbsp;
+      <a href="espagnol.html">espagnol</a>
+    </div>
   </div>
-
-  <div class="card">
-    <h2>🇪🇸 Version Espagnole</h2>
-    <p>Voir le site en espagnol.</p>
-    <a href="espagnol.html" class="btn" style="background:#c0392b;">Accéder</a>
-  </div>
-
-  <div class="card">
-    <h2>💡 Conseils</h2>
-    <ul>
-      <li>Pratique tous les jours</li>
-      <li>Écoute des vidéos en anglais</li>
-      <li>Lis et écris régulièrement</li>
-    </ul>
-  </div>
-
-</div>
-
-<footer>
-  © 2026 - English Project
-</footer>
-
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
-}
-</script>
-
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+    window.location.replace('app.html');
+  </script>
 </body>
 </html>
