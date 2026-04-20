@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#1a4a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Révision d'anglais adaptative CTI — Dakar">
+<title>CTI English 📘</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#f0ede6;color:#1c1a14;
+  min-height:100vh;display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+button{cursor:pointer;border:none;outline:none;font-family:inherit}
+input{font-family:inherit}
+img{max-width:100%;display:block}
+
+/* ── VARIABLES ────────────────────────────────────────────── */
+:root{
+  --blue:#1a4a8a;--blue-light:#2a6aaa;--blue-pale:#e0ecfa;
+  --gold:#d4a840;--gold-light:#f5d980;
+  --green:#2d7a1a;--green-light:#e8f5d8;
+  --red:#8a1a1a;--red-light:#fdeaea;
+  --bg:#f0ede6;--bg2:#faf9f6;--border:#d8d4cc;
+  --text:#1c1a14;--text2:#5a5650;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(0,0,0,.10);
+  --shadow-lg:0 6px 32px rgba(0,0,0,.15);
+}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+.container{max-width:520px;width:100%;margin:0 auto;padding:16px}
+
+/* ── TOP BAR ──────────────────────────────────────────────── */
+.topbar{
+  background:var(--blue);color:#fff;
+  padding:10px 16px;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:var(--shadow);
+}
+.topbar-title{font-size:1.05rem;font-weight:700;letter-spacing:.02em}
+.badge-online,.badge-offline{
+  font-size:.72rem;padding:2px 8px;border-radius:20px;font-weight:600;
+}
+.badge-online{background:rgba(255,255,255,.18);color:#aee}
+.badge-offline{background:rgba(255,80,80,.25);color:#fcc}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(135deg,var(--blue) 0%,var(--blue-light) 100%);
+  color:#fff;padding:40px 24px 32px;text-align:center;
+}
+.hero-emoji{font-size:3.5rem;line-height:1;margin-bottom:12px}
+.hero h1{font-size:1.7rem;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+.hero p{font-size:.95rem;opacity:.85;line-height:1.5}
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.card{
+  background:#fff;border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.card-title{
+  font-size:.8rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text2);margin-bottom:12px;
+}
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;padding:12px 20px;border-radius:var(--radius-sm);
+  font-size:.95rem;font-weight:600;transition:all .15s;
+  text-decoration:none;width:100%;margin-bottom:8px;
+}
+.btn:last-child{margin-bottom:0}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-light)}
+.btn-primary:active{transform:scale(.98)}
+.btn-secondary{background:var(--bg2);color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-gold{background:var(--gold);color:#1c1a14}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-danger{background:var(--red-light);color:var(--red);border:1.5px solid var(--red)}
+.btn-sm{padding:8px 14px;font-size:.85rem;width:auto;margin-bottom:0}
+.btn-active{box-shadow:0 0 0 2px var(--gold) !important}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── LEVEL CARDS ──────────────────────────────────────────── */
+.level-card{
+  background:#fff;border-radius:var(--radius);padding:18px;
+  border:2px solid transparent;cursor:pointer;
+  transition:all .2s;margin-bottom:12px;display:block;width:100%;
+  text-align:left;
+}
+.level-card:hover,.level-card:focus{border-color:var(--blue);background:var(--blue-pale)}
+.level-card .level-emoji{font-size:1.8rem;margin-bottom:4px}
+.level-card .level-name{font-size:1.1rem;font-weight:700;color:var(--blue)}
+.level-card .level-desc{font-size:.82rem;color:var(--text2);margin-top:4px;line-height:1.4}
+
+/* ── API KEY INPUT ────────────────────────────────────────── */
+.apikey-wrap{display:flex;gap:8px;margin-bottom:8px}
+.apikey-wrap input{
+  flex:1;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-size:.9rem;background:#fff;
+  color:var(--text);
+}
+.apikey-wrap input:focus{border-color:var(--blue);outline:none}
+.apikey-wrap button{flex-shrink:0}
+.hint-text{font-size:.78rem;color:var(--text2);line-height:1.5}
+
+/* ── DASHBOARD / PROGRESS ─────────────────────────────────── */
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.dash-cell{background:var(--bg2);border-radius:var(--radius-sm);padding:8px;text-align:center}
+.dash-val{font-size:1.25rem;font-weight:800;color:var(--blue)}
+.dash-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.progress-bar{background:var(--border);border-radius:20px;height:8px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:20px;transition:width .4s ease}
+.progress-good{background:var(--green)}
+.progress-mid{background:var(--gold)}
+.progress-low{background:var(--red)}
+
+/* ── QUESTION ZONE ────────────────────────────────────────── */
+.question-header{
+  display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;
+}
+.cat-badge{
+  background:var(--blue-pale);color:var(--blue);
+  font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.level-badge-q{
+  background:var(--gold);color:#1c1a14;
+  font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:20px;
+}
+.question-text{
+  font-size:1.12rem;font-weight:600;line-height:1.5;
+  color:var(--text);margin-bottom:8px;
+}
+.question-hint{
+  font-size:.82rem;color:var(--text2);
+  background:var(--bg2);padding:8px 12px;border-radius:var(--radius-sm);
+  border-left:3px solid var(--gold);margin-bottom:12px;
+}
+
+/* ── QCM OPTIONS ─────────────────────────────────────────── */
+#section-options{display:grid;gap:8px;margin-bottom:12px}
+.option-btn{
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 16px;
+  text-align:left;font-size:.95rem;font-weight:500;
+  transition:all .15s;
+}
+.option-btn:hover:not(:disabled){border-color:var(--blue);background:var(--blue-pale)}
+.option-btn:active:not(:disabled){transform:scale(.98)}
+.option-correct{background:var(--green-light) !important;border-color:var(--green) !important;color:var(--green) !important}
+.option-wrong{background:var(--red-light) !important;border-color:var(--red) !important;color:var(--red) !important}
+
+/* ── FREE TEXT ────────────────────────────────────────────── */
+.freetext-wrap{display:flex;gap:8px;margin-bottom:8px}
+.freetext-wrap input{
+  flex:1;padding:12px 14px;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-size:.95rem;background:#fff;color:var(--text);
+}
+.freetext-wrap input:focus{border-color:var(--blue);outline:none}
+
+/* ── CORRECTION ──────────────────────────────────────────── */
+.correction-box{
+  border-radius:var(--radius);padding:14px;margin-bottom:12px;
+  border-left:4px solid;
+}
+.correction-box.correct{background:var(--green-light);border-color:var(--green)}
+.correction-box.wrong{background:var(--red-light);border-color:var(--red)}
+.correction-status{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+.correction-expected{font-size:.9rem;font-weight:600;margin-bottom:6px}
+.correction-explanation{font-size:.85rem;color:var(--text2);margin-bottom:4px}
+.correction-example{font-size:.82rem;color:var(--text2);font-style:italic}
+.ai-block{
+  background:var(--blue-pale);border-radius:var(--radius-sm);
+  padding:12px;margin-top:10px;
+  border-left:3px solid var(--blue);
+}
+.ai-block-title{font-size:.78rem;font-weight:700;color:var(--blue);margin-bottom:6px;text-transform:uppercase}
+.ai-block-text{font-size:.88rem;line-height:1.6;color:var(--text);white-space:pre-wrap}
+
+/* ── LEVEL SUGGESTION ────────────────────────────────────── */
+.level-suggestion-box{
+  background:#fff3cd;border:1.5px solid var(--gold);
+  border-radius:var(--radius);padding:14px;margin-bottom:12px;
+}
+.level-sug-text{font-size:.95rem;font-weight:600;margin-bottom:10px}
+.level-sug-btns{display:flex;gap:8px}
+.level-sug-btns .btn{margin-bottom:0}
+
+/* ── SESSION REPORT ──────────────────────────────────────── */
+.report-box{
+  background:var(--blue-pale);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;
+}
+.report-title{font-size:.85rem;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase}
+.report-text{font-size:.88rem;line-height:1.7;color:var(--text);white-space:pre-wrap}
+
+/* ── LOADER ──────────────────────────────────────────────── */
+.loader{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:.85rem;padding:8px 0}
+.spinner{
+  width:18px;height:18px;border:2.5px solid var(--border);
+  border-top-color:var(--blue);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── FEEDBACK FLASH ──────────────────────────────────────── */
+#feedback-flash{
+  position:fixed;inset:0;pointer-events:none;
+  opacity:0;transition:opacity .3s;z-index:9999;
+}
+.feedback-correct{background:rgba(45,122,26,.15)}
+.feedback-wrong{background:rgba(138,26,26,.12)}
+
+/* ── TOAST ───────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+  padding:10px 20px;border-radius:24px;font-size:.88rem;font-weight:600;
+  white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transition:all .3s;z-index:9000;pointer-events:none;
+  box-shadow:var(--shadow-lg);
+}
+.toast-show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-info{background:var(--blue);color:#fff}
+.toast-success{background:var(--green);color:#fff}
+.toast-warning{background:var(--gold);color:#1c1a14}
+.toast-error{background:var(--red);color:#fff}
+
+/* ── VOICE BUTTONS ───────────────────────────────────────── */
+.voice-row{display:flex;gap:8px;margin-bottom:12px}
+.voice-row .btn{flex:1;font-size:.82rem;padding:9px 12px}
+
+/* ── END SCREEN ──────────────────────────────────────────── */
+.end-score{font-size:3rem;font-weight:800;color:var(--blue);text-align:center;margin:16px 0 4px}
+.end-pct{font-size:1.5rem;text-align:center;color:var(--text2);margin-bottom:16px}
+.end-export{display:grid;gap:8px}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media(min-width:600px){
+  .container{padding:24px}
+  .question-text{font-size:1.2rem}
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#18171f;--bg2:#201f28;--border:#38374a;
+    --text:#eeeef4;--text2:#9998a8;--blue-pale:#1a2840;
+    --green-light:#1a2d16;--red-light:#2d1616;
+  }
+  body{background:var(--bg);color:var(--text)}
+  .card,.option-btn,.level-card,.apikey-wrap input,.freetext-wrap input{background:var(--bg2);color:var(--text)}
+  .option-btn{border-color:var(--border)}
+  .correction-box.correct{background:var(--green-light)}
+  .correction-box.wrong{background:var(--red-light)}
+}
+</style>
+</head>
+<body>
+
+<!-- ── FEEDBACK FLASH ──────────────────────────────────────── -->
+<div id="feedback-flash"></div>
+
+<!-- ── TOAST ──────────────────────────────────────────────── -->
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 1 — ACCUEIL
+═════════════════════════════════════════════════════════════ -->
+<section id="screen-welcome" class="screen active" role="main">
+  <div class="hero">
+    <div class="hero-emoji">📘</div>
+    <h1>CTI English</h1>
+    <p>Révision d'anglais adaptative<br>pour apprenants francophones · Dakar</p>
+  </div>
+  <div class="container" style="flex:1">
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Fonctionnalités</div>
+      <p style="font-size:.9rem;color:var(--text2);line-height:1.7">
+        ✅ Questions adaptatives par niveau<br>
+        🤖 Explications IA (Claude Sonnet)<br>
+        🔊 Lecture vocale (TTS) &amp; dictée (STT)<br>
+        📄 Rapport de session &amp; export PDF<br>
+        📵 Mode hors ligne (questions statiques)
+      </p>
+    </div>
+    <button id="btn-start" class="btn btn-primary" aria-label="Commencer la révision">
+      Commencer 🚀
+    </button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 2 — SÉLECTION DU NIVEAU
+═════════════════════════════════════════════════════════════ -->
+<section id="screen-level" class="screen" role="main">
+  <div class="topbar">
+    <span class="topbar-title">📘 CTI English</span>
+    <span id="badge-online" class="badge-online">🟢 En ligne</span>
+  </div>
+  <div class="container">
+    <h2 style="margin:16px 0 8px;font-size:1.2rem">Choisir un niveau</h2>
+    <p style="font-size:.85rem;color:var(--text2);margin-bottom:16px">Commence au niveau qui te correspond. Tu pourras changer en cours de session.</p>
+
+    <button id="btn-level-starter" class="level-card" aria-label="Niveau Starter">
+      <div class="level-emoji">🌱</div>
+      <div class="level-name">Starter</div>
+      <div class="level-desc">Bases essentielles : To Be, To Have, alphabet, vocabulaire courant. Idéal pour débutants.</div>
+    </button>
+
+    <button id="btn-level-builder" class="level-card" aria-label="Niveau Builder">
+      <div class="level-emoji">🔨</div>
+      <div class="level-name">Builder</div>
+      <div class="level-desc">Construire des phrases : Present Perfect, Past Simple, WH Questions, idiomes. Niveau intermédiaire.</div>
+    </button>
+
+    <button id="btn-level-challenger" class="level-card" aria-label="Niveau Challenger">
+      <div class="level-emoji">🏆</div>
+      <div class="level-name">Challenger</div>
+      <div class="level-desc">Traductions complexes, conjugaisons avancées, expressions idiomatiques. Niveau confirmé.</div>
+    </button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 3 — CLÉ API
+═════════════════════════════════════════════════════════════ -->
+<section id="screen-apikey" class="screen" role="main">
+  <div class="topbar">
+    <span class="topbar-title">📘 CTI English</span>
+    <span id="badge-online" class="badge-online">🟢</span>
+  </div>
+  <div class="container">
+    <div style="margin:16px 0 8px;display:flex;align-items:center;gap:10px">
+      <div style="background:var(--blue-pale);border-radius:8px;padding:8px 12px;font-size:.9rem;color:var(--blue);font-weight:600">
+        Niveau sélectionné : <strong id="selected-level-display" data-level="builder">Builder 🔨</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔑 Clé API Anthropic (optionnelle)</div>
+      <div class="apikey-wrap">
+        <input type="password" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" aria-label="Clé API Anthropic">
+        <button id="btn-toggle-apikey" class="btn btn-secondary btn-sm" aria-label="Afficher/masquer la clé">👁</button>
+      </div>
+      <p class="hint-text">
+        La clé API active les explications IA, la génération d'exercices et les rapports personnalisés.<br>
+        <strong>Sans clé</strong> : 210+ questions statiques disponibles hors ligne. 🔒 Non stockée.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📚 Comment obtenir une clé API</div>
+      <p class="hint-text" style="margin-bottom:8px">
+        1. Crée un compte sur <strong>console.anthropic.com</strong><br>
+        2. Génère une clé API dans "API Keys"<br>
+        3. Colle-la ci-dessus (commence par <code>sk-ant-</code>)
+      </p>
+    </div>
+
+    <button id="btn-validate-apikey" class="btn btn-primary">
+      Continuer →
+    </button>
+    <button class="btn btn-secondary" onclick="document.getElementById('input-apikey').value='';document.getElementById('btn-validate-apikey').click()">
+      Continuer sans clé (hors ligne)
+    </button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 4 — JEU
+═════════════════════════════════════════════════════════════ -->
+<section id="screen-game" class="screen" role="main">
+  <div class="topbar">
+    <span class="topbar-title">📘 CTI English</span>
+    <span id="badge-online" class="badge-online">🟢 En ligne</span>
+  </div>
+
+  <div class="container">
+    <!-- Tableau de bord -->
+    <div class="card" style="margin-top:12px">
+      <div class="dash-grid">
+        <div class="dash-cell">
+          <div class="dash-val" id="dash-score">0/0</div>
+          <div class="dash-lbl">Score</div>
+        </div>
+        <div class="dash-cell">
+          <div class="dash-val" id="dash-percent">0%</div>
+          <div class="dash-lbl">Réussite</div>
+        </div>
+        <div class="dash-cell">
+          <div class="dash-val" id="dash-streak">🔥 0</div>
+          <div class="dash-lbl">Série</div>
+        </div>
+      </div>
+      <div class="progress-bar">
+        <div id="progress-bar-fill" class="progress-fill progress-low" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <span style="font-size:.72rem;color:var(--text2)">Niveau : <strong id="dash-level">—</strong></span>
+        <span style="font-size:.72rem;color:var(--text2)" id="dash-duration">00:00</span>
+      </div>
+    </div>
+
+    <!-- Commandes vocales -->
+    <div class="voice-row">
+      <button id="btn-tts" class="btn btn-secondary btn-sm" aria-label="Activer lecture vocale" title="Text-to-Speech">
+        🔊 TTS
+      </button>
+      <button id="btn-stt" class="btn btn-secondary btn-sm" aria-label="Activer dictée vocale" title="Speech-to-Text">
+        🎤 Dicter
+      </button>
+      <button id="btn-change-level" class="btn btn-secondary btn-sm" aria-label="Changer de niveau">
+        ⚙️ Niveau
+      </button>
+    </div>
+
+    <!-- Loader question -->
+    <div id="section-question-loader" class="loader" style="display:none">
+      <div class="spinner"></div>Chargement de la question...
+    </div>
+
+    <!-- Loader IA -->
+    <div id="section-ai-loader" class="loader" style="display:none">
+      <div class="spinner"></div>🤖 Génération IA en cours...
+    </div>
+
+    <!-- QUESTION -->
+    <div id="section-question" class="card" style="display:none">
+      <div class="question-header">
+        <span class="cat-badge" id="question-category">—</span>
+        <span class="level-badge-q" id="question-level-badge">—</span>
+      </div>
+      <div class="question-text" id="question-text"></div>
+      <div class="question-hint" id="question-hint" style="display:none"></div>
+    </div>
+
+    <!-- QCM OPTIONS -->
+    <div id="section-options" style="display:none"></div>
+
+    <!-- TEXTE LIBRE (lacune, traduction, conjugaison) -->
+    <div id="section-freetext" style="display:none">
+      <div class="freetext-wrap">
+        <input type="text" id="input-answer" placeholder="Ta réponse..." autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Réponse">
+        <button id="btn-submit-text" class="btn btn-primary btn-sm" aria-label="Valider">✓</button>
+      </div>
+    </div>
+
+    <!-- SUGGESTION DE NIVEAU -->
+    <div id="level-suggestion" class="level-suggestion-box" style="display:none" role="alert">
+      <div class="level-sug-text" id="level-suggestion-text" data-new-level=""></div>
+      <div class="level-sug-btns">
+        <button id="btn-level-accept" class="btn btn-gold btn-sm">Changer ✓</button>
+        <button id="btn-level-decline" class="btn btn-secondary btn-sm">Rester</button>
+      </div>
+    </div>
+
+    <!-- CORRECTION -->
+    <div id="section-correction" class="card" style="display:none">
+      <div class="correction-box wrong" id="correction-box">
+        <div class="correction-status" id="correction-status"></div>
+        <div class="correction-expected" id="correction-expected"></div>
+        <div class="correction-explanation" id="correction-explanation"></div>
+        <div class="correction-example" id="correction-example"></div>
+      </div>
+      <!-- Loader IA explication -->
+      <div id="correction-ai-loader" class="loader" style="display:none">
+        <div class="spinner"></div>🤖 Explication IA...
+      </div>
+      <!-- Bloc IA explication -->
+      <div id="correction-ai-block" class="ai-block" style="display:none">
+        <div class="ai-block-title">💡 Explication IA</div>
+        <div class="ai-block-text" id="correction-ai-text"></div>
+      </div>
+    </div>
+
+    <!-- RAPPORT DE SESSION (tous les 20 questions) -->
+    <div id="section-session-report" class="report-box" style="display:none">
+      <div class="report-title">📊 Rapport IA — Points de progression</div>
+      <div class="report-text" id="session-report-text"></div>
+    </div>
+
+    <!-- BOUTON SUIVANT -->
+    <button id="btn-next" class="btn btn-primary" style="display:none" aria-label="Question suivante">
+      Question suivante →
+    </button>
+
+    <!-- Accès rapport final -->
+    <button class="btn btn-secondary btn-sm" onclick="App._goToEnd && App._goToEnd()" style="margin-top:4px" aria-label="Voir le rapport final">
+      📄 Rapport final
+    </button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN 5 — RAPPORT FINAL
+═════════════════════════════════════════════════════════════ -->
+<section id="screen-end" class="screen" role="main">
+  <div class="topbar">
+    <span class="topbar-title">📘 Rapport final</span>
+    <span id="badge-online" class="badge-online">🟢</span>
+  </div>
+  <div class="container">
+    <div class="card" style="text-align:center;margin-top:16px">
+      <div class="end-score" id="end-score">—</div>
+      <div class="end-pct" id="end-pct">—</div>
+      <div style="font-size:.85rem;color:var(--text2)" id="end-level">—</div>
+    </div>
+
+    <div id="end-ai-report" class="report-box" style="display:none">
+      <div class="report-title">🤖 Analyse IA &amp; Conseils</div>
+      <div id="end-ai-loader" class="loader" style="display:none">
+        <div class="spinner"></div>Génération du rapport...
+      </div>
+      <div class="report-text" id="end-report-text"></div>
+    </div>
+
+    <div class="end-export">
+      <button id="btn-export-pdf" class="btn btn-primary">📄 Exporter en PDF</button>
+      <button id="btn-export-json" class="btn btn-secondary">⬇️ Télécharger JSON</button>
+      <button id="btn-share" class="btn btn-gold">📤 Partager mon score</button>
+      <button id="btn-restart" class="btn btn-secondary">🔄 Nouvelle session</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCRIPTS — Ordre d'inclusion important
+═════════════════════════════════════════════════════════════ -->
+<script src="questionPool.js"></script>
+<script src="sessionState.js"></script>
+<script src="aiEngine.js"></script>
+<script src="adaptiveEngine.js"></script>
+<script src="voiceModule.js"></script>
+<script src="exportModule.js"></script>
+<script src="app.js"></script>
+
+<script>
+// ── Patch : Rapport final accessible depuis le jeu ────────────
+App._goToEnd = async function() {
+  const state = getState();
+  const stats = getSessionStats();
+  document.getElementById('end-score').textContent = `${stats.totalCorrect}/${stats.totalQuestions}`;
+  document.getElementById('end-pct').textContent = `${stats.percentage}%`;
+  document.getElementById('end-level').textContent = stats.levelLabel || stats.level;
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-end').classList.add('active');
+  window.scrollTo(0,0);
+
+  if (state.apiKey && state.isOnline) {
+    const aiBox = document.getElementById('end-ai-report');
+    const loader = document.getElementById('end-ai-loader');
+    const text = document.getElementById('end-report-text');
+    aiBox.style.display = '';
+    loader.style.display = '';
+    try {
+      const r = await generateSessionReport({ stats, apiKey: state.apiKey });
+      if (r?.text) text.textContent = r.text;
+    } catch(_) {}
+    loader.style.display = 'none';
+  }
+};
+
+// ── Hint toggle ───────────────────────────────────────────────
+document.addEventListener('click', e => {
+  if (e.target.id === 'question-hint-toggle') {
+    const hint = document.getElementById('question-hint');
+    if (hint) hint.style.display = hint.style.display === 'none' ? '' : 'none';
+  }
+});
+
+// ── Service Worker ────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// ── Corriger l'affichage du hint (show si non vide) ───────────
+const _origRender = window._renderQuestion;
+document.addEventListener('DOMContentLoaded', () => {
+  const hintEl = document.getElementById('question-hint');
+  const observer = new MutationObserver(() => {
+    if (hintEl) {
+      hintEl.style.display = hintEl.textContent.trim() ? '' : 'none';
+    }
+  });
+  if (hintEl) observer.observe(hintEl, { childList: true, characterData: true, subtree: true });
+});
+</script>
+</body>
+</html>
