@@ -245,6 +245,10 @@ function _renderQuestion(question, level) {
   _setText('question-level-badge',
     { starter: 'Starter 🌱', builder: 'Builder 🔨', challenger: 'Challenger 🏆' }[level] || level);
 
+  // Numéro de question
+  const st = getState();
+  _setText('question-num', `Q${st.totalQuestions + 1}`);
+
   // Texte de la question
   _setText('question-text', question.question);
   _setText('question-hint', question.hint || '');
@@ -274,11 +278,12 @@ function _renderQCM(question) {
   const { options: shuffled, answer_index: newIdx } = shuffleQCMOptions(opts, question.answer_index);
   App.currentQuestion = { ...question, _shuffledOptions: shuffled, _shuffledAnswerIdx: newIdx };
 
+  const letters = ['A', 'B', 'C', 'D', 'E'];
   shuffled.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
-    btn.textContent = opt;
     btn.dataset.index = i;
+    btn.innerHTML = `<span class="option-letter">${letters[i] || (i+1)}</span><span>${opt}</span>`;
     btn.addEventListener('click', () => _onQCMAnswer(i));
     container.appendChild(btn);
   });
@@ -342,9 +347,9 @@ async function _onAnswered({ correct, userAnswer, correctAnswer }) {
   _show('section-correction');
   _show('btn-next');
 
-  // Mettre à jour la classe de la boîte de correction
+  // Mettre à jour la classe du header de correction
   const corrBox = document.getElementById('correction-box');
-  if (corrBox) corrBox.className = `correction-box ${correct ? 'correct' : 'wrong'}`;
+  if (corrBox) corrBox.className = `correction-header ${correct ? 'correct' : 'wrong'}`;
 
   // Correction statique d'abord
   _setText('correction-status', correct ? '✅ Correct !' : '❌ Incorrect');
