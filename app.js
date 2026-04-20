@@ -35,11 +35,11 @@ function _initOnlineStatus() {
   const update = () => {
     const online = navigator.onLine;
     setOnlineStatus(online);
-    const badge = document.getElementById('badge-online');
-    if (badge) {
-      badge.textContent = online ? '🟢 En ligne' : '🔴 Hors ligne';
-      badge.className = online ? 'badge-online' : 'badge-offline';
-    }
+    document.querySelectorAll('.badge-online-status').forEach(badge => {
+      badge.textContent = online ? '● En ligne' : '● Hors ligne';
+      badge.className = `badge-online-status ${online ? 'badge-online' : 'badge-offline'}`;
+    });
+    _updateAIStatusBar();
   };
   window.addEventListener('online', update);
   window.addEventListener('offline', update);
@@ -172,6 +172,12 @@ async function _onValidateApiKey() {
 function _startGame() {
   _showScreen('screen-game');
   _updateDashboard();
+  // Démarrer le chronomètre de session
+  if (App.timerInterval) clearInterval(App.timerInterval);
+  App.timerInterval = setInterval(() => {
+    const stats = computeDashboardStats(getState());
+    _setText('dash-duration', stats.duration);
+  }, 1000);
   _nextQuestion();
 }
 
@@ -179,6 +185,9 @@ function _startGame() {
 async function _nextQuestion() {
   _hideAll(['section-correction', 'section-options', 'section-freetext',
             'section-conjugaison', 'btn-next', 'level-suggestion']);
+  // Réinitialiser le hint pour la prochaine question
+  const hintEl = document.getElementById('question-hint');
+  if (hintEl) { hintEl.textContent = ''; hintEl.style.display = 'none'; }
   _show('section-question-loader');
 
   const state = getState();
@@ -187,6 +196,7 @@ async function _nextQuestion() {
   // Sélection de la catégorie
   const category = selectWeightedCategory(allCats, state.categories);
   App.currentCategory = category;
+  _updateAdaptivePanel();
 
   // Vérifier si on doit générer via IA
   const poolSize = getPoolSizeForCategory(category);
@@ -251,7 +261,14 @@ function _renderQuestion(question, level) {
 
   // Texte de la question
   _setText('question-text', question.question);
-  _setText('question-hint', question.hint || '');
+  const hintDiv = document.getElementById('question-hint');
+  if (hintDiv) {
+    hintDiv.textContent = question.hint || '';
+    hintDiv.style.display = question.hint ? '' : 'none';
+  }
+  // Réinitialiser le bloc bilingue pour la prochaine correction
+  const biEl = document.getElementById('correction-bilingual');
+  if (biEl) biEl.style.display = 'none';
   _show('section-question');
 
   // Rendu selon le type
@@ -275,7 +292,7 @@ function _renderQCM(question) {
   const container = document.getElementById('section-options');
   container.innerHTML = '';
   const opts = question.options || [];
-  const { options: shuffled, answer_index: newIdx } = shuffleQCMOptions(opts, question.answer_index);
+  const { options: shuffled, answerIndex: newIdx } = shuffleQCMOptions(opts, question.answer_index);
   App.currentQuestion = { ...question, _shuffledOptions: shuffled, _shuffledAnswerIdx: newIdx };
 
   const letters = ['A', 'B', 'C', 'D', 'E'];
@@ -351,11 +368,17 @@ async function _onAnswered({ correct, userAnswer, correctAnswer }) {
   const corrBox = document.getElementById('correction-box');
   if (corrBox) corrBox.className = `correction-header ${correct ? 'correct' : 'wrong'}`;
 
-  // Correction statique d'abord
+  // Correction statique — status + bonne réponse
   _setText('correction-status', correct ? '✅ Correct !' : '❌ Incorrect');
-  _setText('correction-expected', `Bonne réponse : ${correctAnswer}`);
-  _setText('correction-explanation', q.explication_fr || '');
-  _setText('correction-example', q.explication_en || '');
+  _setText('correction-expected', correct ? `✔ ${correctAnswer}` : `Bonne réponse : ${correctAnswer}`);
+
+  // Explications bilingues FR + EN
+  const fr = q.explication_fr || '';
+  const en = q.explication_en || '';
+  _setText('correction-explanation', fr);
+  _setText('correction-example', en);
+  const bilingualEl = document.getElementById('correction-bilingual');
+  if (bilingualEl) bilingualEl.style.display = (fr || en) ? '' : 'none';
 
   // TTS correction
   if (isTTSActive()) speakCorrection(correctAnswer, q.explication_en, getState().level);
@@ -395,10 +418,35 @@ async function _onAnswered({ correct, userAnswer, correctAnswer }) {
     }
   }
 
+  // Mode révision IA si 3 erreurs consécutives sur la même catégorie
+  if (triggers?.shouldRevise && triggers.revisionCategory && state.apiKey && state.isOnline) {
+    _triggerRevision(triggers.revisionCategory);
+  }
+
   // Rapport de session tous les 20 questions
   if (state.totalQuestions > 0 && state.totalQuestions % 20 === 0) {
     _triggerSessionReport();
   }
+}
+
+// ─── RÉVISION IA (3 erreurs consécutives) ────────────────────
+async function _triggerRevision(category) {
+  const state = getState();
+  const errors = getRecentErrors(category, 3);
+  if (errors.length === 0) return;
+  try {
+    const result = await generateRevision({
+      category,
+      level: state.level,
+      specificErrors: errors,
+      apiKey: state.apiKey,
+    });
+    if (result?.text) {
+      _setText('session-report-text',
+        `🔁 Révision — ${category}\n\n${result.text}`);
+      _show('section-session-report');
+    }
+  } catch (_) {}
 }
 
 // ─── RAPPORT DE SESSION ──────────────────────────────────────
@@ -420,18 +468,97 @@ function _updateDashboard() {
   const stats = computeDashboardStats(getState());
   _setText('dash-score', stats.score);
   _setText('dash-percent', `${stats.percentage}%`);
-  _setText('dash-streak', `🔥 ${stats.streak}`);
+  const streakEl = document.getElementById('dash-streak');
+  if (streakEl) {
+    streakEl.textContent = `🔥 ${stats.streak}`;
+    streakEl.classList.toggle('streak-high', stats.streak >= 3);
+  }
   _setText('dash-level', stats.level);
   _setText('dash-duration', stats.duration);
 
   const bar = document.getElementById('progress-bar-fill');
-  if (bar) bar.style.width = `${stats.percentage}%`;
-
-  // Couleur de la barre
   if (bar) {
+    bar.style.width = `${stats.percentage}%`;
     bar.className = 'progress-fill ' +
       (stats.percentage >= 70 ? 'progress-good' : stats.percentage >= 50 ? 'progress-mid' : 'progress-low');
   }
+  _updateAdaptivePanel();
+}
+
+// ─── PANNEAU ADAPTATIF (moteur + IA) ───────────────────────────
+function _updateAdaptivePanel() {
+  const state = getState();
+
+  // — Focus actuel (catégorie ciblée)
+  if (App.currentCategory) {
+    _setText('adapt-focus', App.currentCategory);
+    const catSt = state.categories[App.currentCategory];
+    let reason = 'Nouvelle';
+    if (catSt && catSt.total > 0) {
+      const sc = Math.round(catSt.ok / catSt.total * 100);
+      reason = sc < 50 ? `Faible ${sc}%` : sc >= 80 ? `Fort ${sc}%` : `Moyen ${sc}%`;
+    }
+    _setText('adapt-reason', reason);
+  }
+
+  // — Statut IA
+  _updateAIStatusBar();
+
+  // — Questions générées par IA
+  const aiCount = Object.values(state.categories)
+    .reduce((sum, c) => sum + (c.generatedCount || 0), 0);
+  _setText('adapt-ai-count', aiCount);
+
+  // — Catégories faibles (score < 50%)
+  const weakCount = Object.values(state.categories)
+    .filter(c => c.total >= 2 && c.ok / c.total < 0.5).length;
+  _setText('adapt-weak-count', weakCount);
+
+  // — Grille catégories
+  _renderCatGrid(state);
+}
+
+function _updateAIStatusBar() {
+  const bar = document.getElementById('ai-status-bar');
+  const txt = document.getElementById('ai-status-text');
+  if (!bar || !txt) return;
+  const state = getState();
+  const hasKey = !!(state.apiKey);
+  const online = state.isOnline;
+  if (hasKey && online) {
+    bar.className = 'ai-status-bar ai-active';
+    txt.textContent = `IA Claude Sonnet — active (en ligne)`;
+  } else if (hasKey && !online) {
+    bar.className = 'ai-status-bar ai-inactive';
+    txt.textContent = `IA : clé configurée, mais hors ligne`;
+  } else {
+    bar.className = 'ai-status-bar ai-inactive';
+    txt.textContent = `IA : non configurée — mode statique (206 questions)`;
+  }
+}
+
+function _renderCatGrid(state) {
+  const grid = document.getElementById('cat-grid');
+  if (!grid) return;
+  const cats = Object.entries(state.categories)
+    .filter(([, s]) => s.total > 0)
+    .sort((a, b) => (a[1].ok / a[1].total) - (b[1].ok / b[1].total));
+
+  if (cats.length === 0) {
+    grid.innerHTML = '<div style="font-size:.8rem;color:var(--text3);font-style:italic;padding:4px 0">Réponds à quelques questions pour voir tes scores…</div>';
+    return;
+  }
+
+  grid.innerHTML = cats.map(([name, s]) => {
+    const pct = Math.round(s.ok / s.total * 100);
+    const barClass = pct >= 70 ? 'cat-bar-good' : pct >= 50 ? 'cat-bar-mid' : 'cat-bar-low';
+    const isCurrentFocus = name === App.currentCategory;
+    return `<div class="cat-row" style="${isCurrentFocus ? 'background:var(--blue-pale2);border-radius:6px;padding:2px 4px;margin:0 -4px' : ''}">
+      <span class="cat-row-name" title="${name}">${isCurrentFocus ? '🎯 ' : ''}${name}</span>
+      <div class="cat-bar-wrap"><div class="cat-bar ${barClass}" style="width:${pct}%"></div></div>
+      <span class="cat-score" style="color:${pct>=70?'var(--green)':pct>=50?'var(--gold)':'var(--red)'}">${pct}%</span>
+    </div>`;
+  }).join('');
 }
 
 // ─── SUGGESTION DE NIVEAU ────────────────────────────────────

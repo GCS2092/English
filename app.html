@@ -312,7 +312,12 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 .correction-body{background:var(--bg3);padding:14px 16px;border-top:1px solid var(--border)}
 .correction-expected{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:6px}
 .correction-explanation{font-size:.82rem;color:var(--text2);margin-bottom:4px;line-height:1.5}
-.correction-example{font-size:.8rem;color:var(--text2);font-style:italic;padding-top:4px;border-top:1px dashed var(--border)}
+.correction-example{font-size:.82rem;color:var(--text2)}
+.correction-bilingual{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.correction-lang-row{display:flex;align-items:flex-start;gap:8px}
+.lang-flag{font-size:1rem;flex-shrink:0;line-height:1.4}
+.correction-lang-row .correction-explanation{font-size:.84rem;color:var(--text);font-weight:500;line-height:1.5}
+.correction-lang-row .correction-example{font-size:.82rem;color:var(--text2);font-style:italic;line-height:1.5}
 .ai-block{
   background:linear-gradient(135deg,var(--blue-pale2),var(--blue-pale));
   border-radius:var(--radius-xs);padding:12px 14px;margin-top:10px;
@@ -504,7 +509,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <section id="screen-level" class="screen" role="main">
   <div class="topbar">
     <span class="topbar-title">📘 CTI English</span>
-    <div class="topbar-right"><span id="badge-online" class="badge-online">● En ligne</span></div>
+    <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
   </div>
   <div class="container">
     <div style="margin:16px 0 6px">
@@ -545,7 +550,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <section id="screen-apikey" class="screen" role="main">
   <div class="topbar">
     <span class="topbar-title">📘 CTI English</span>
-    <div class="topbar-right"><span id="badge-online" class="badge-online">● En ligne</span></div>
+    <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
   </div>
   <div class="container">
     <div style="margin:16px 0 12px">
@@ -583,7 +588,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
   <div class="topbar">
     <span class="topbar-title">📘 CTI English</span>
     <div class="topbar-right">
-      <span id="badge-online" class="badge-online">● En ligne</span>
+      <span class="badge-online-status badge-online">● En ligne</span>
     </div>
   </div>
 
@@ -621,6 +626,47 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
       <button id="btn-stt" class="btn btn-secondary btn-sm" title="Dictée vocale">🎤 STT</button>
       <button id="btn-change-level" class="btn btn-secondary btn-sm">⚙️ Niveau</button>
       <button class="btn btn-secondary btn-sm" onclick="App._goToEnd&&App._goToEnd()">📄 Bilan</button>
+    </div>
+
+    <!-- ══ PANNEAU APPRENTISSAGE ADAPTATIF ══════════════════════ -->
+    <div class="adaptive-panel">
+      <button class="adaptive-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.adaptive-toggle-arrow').style.transform=this.nextElementSibling.classList.contains('open')?'rotate(180deg)':''">
+        <span>🧠 Moteur adaptatif &amp; IA</span>
+        <span class="adaptive-toggle-arrow">▾</span>
+      </button>
+      <div class="adaptive-body">
+
+        <!-- Focus actuel -->
+        <div class="focus-bar">
+          <span class="focus-label">Focus</span>
+          <span class="focus-value" id="adapt-focus">—</span>
+          <span class="focus-badge" id="adapt-reason">—</span>
+        </div>
+
+        <!-- Statut IA -->
+        <div class="ai-status-bar ai-inactive" id="ai-status-bar">
+          <span class="ai-dot"></span>
+          <span id="ai-status-text">IA : non configurée (mode statique)</span>
+        </div>
+
+        <!-- Compteurs adaptatifs -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div class="dash-cell" style="padding:7px">
+            <div class="dash-val" id="adapt-ai-count" style="font-size:1rem">0</div>
+            <div class="dash-lbl">Questions IA</div>
+          </div>
+          <div class="dash-cell" style="padding:7px">
+            <div class="dash-val" id="adapt-weak-count" style="font-size:1rem">0</div>
+            <div class="dash-lbl">Catégories faibles</div>
+          </div>
+        </div>
+
+        <!-- Scores par catégorie -->
+        <div class="cat-grid-title">Scores par catégorie</div>
+        <div class="cat-grid" id="cat-grid">
+          <div style="font-size:.8rem;color:var(--text3);font-style:italic;padding:4px 0">Réponds à quelques questions pour voir tes scores…</div>
+        </div>
+      </div>
     </div>
 
     <!-- Loaders -->
@@ -666,8 +712,16 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
         </div>
         <div class="correction-body">
           <div class="correction-expected" id="correction-expected"></div>
-          <div class="correction-explanation" id="correction-explanation"></div>
-          <div class="correction-example" id="correction-example"></div>
+          <div class="correction-bilingual" id="correction-bilingual" style="display:none">
+            <div class="correction-lang-row">
+              <span class="lang-flag">🇫🇷</span>
+              <span class="correction-explanation" id="correction-explanation"></span>
+            </div>
+            <div class="correction-lang-row" style="margin-top:5px">
+              <span class="lang-flag">🇬🇧</span>
+              <span class="correction-example" id="correction-example"></span>
+            </div>
+          </div>
         </div>
       </div>
       <div id="correction-ai-loader" class="loader" style="display:none"><div class="spinner"></div>🤖 Explication IA…</div>
@@ -692,7 +746,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <section id="screen-end" class="screen" role="main">
   <div class="topbar">
     <span class="topbar-title">📊 Bilan de session</span>
-    <div class="topbar-right"><span id="badge-online" class="badge-online">● En ligne</span></div>
+    <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
   </div>
   <div class="container">
     <div class="card" style="text-align:center;margin-top:14px;padding:24px 20px">
