@@ -1,22 +1,26 @@
 // ============================================================
 // sw.js — CTI English PWA — Service Worker cache-first
-// Cache name : cti-anglais-v1
+// Cache name : cti-anglais-v4
 // Stratégie  : Cache First → réseau si absent → fallback offline
 // ============================================================
 
-const CACHE = 'cti-anglais-v1';
+const CACHE = 'cti-anglais-v4';
 
 const STATIC_FILES = [
   '/',
   '/app.html',
   '/index.html',
   '/manifest.json',
+  '/icon.svg',
   '/sessionState.js',
   '/aiEngine.js',
   '/adaptiveEngine.js',
   '/voiceModule.js',
   '/exportModule.js',
+  '/verbModule.js',
   '/questionPool.js',
+  '/questionPool_es.js',
+  '/saveModule.js',
   '/app.js',
 ];
 

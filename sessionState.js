@@ -61,9 +61,10 @@ let sessionState = _createFreshState('starter', null);
  * @param {string} level
  * @param {string|null} apiKey
  */
-function _createFreshState(level, apiKey) {
+function _createFreshState(level, apiKey, language = 'en') {
   return {
     level: LEVELS[level] ? level : 'starter',
+    language: language === 'es' ? 'es' : 'en',
     startTime: Date.now(),
     totalQuestions: 0,
     totalCorrect: 0,
@@ -78,6 +79,7 @@ function _createFreshState(level, apiKey) {
     consecutiveErrorsByCategory: {}, // { [cat]: number }
     levelSuggestionShown: false,   // éviter de répéter la suggestion
     sessionId: `cti-${Date.now()}`,
+    savedAt: null,                 // horodatage de la dernière sauvegarde
   };
 }
 
@@ -88,8 +90,28 @@ function _createFreshState(level, apiKey) {
  * @param {string} apiKey  clé Anthropic — stockée en JS uniquement
  * @returns {Object} le nouvel état
  */
-function initSession(level = 'starter', apiKey = null) {
-  sessionState = _createFreshState(level, apiKey);
+function initSession(level = 'starter', apiKey = null, language = 'en') {
+  sessionState = _createFreshState(level, apiKey, language);
+  return sessionState;
+}
+
+/**
+ * Restaure l'état depuis une sauvegarde (localStorage).
+ * Ne restaure PAS la clé API (sécurité).
+ * @param {Object} saved  objet chargé par saveModule.loadProgress()
+ * @param {string} apiKey clé API actuelle (optionnel)
+ */
+function restoreFromSave(saved, apiKey = null) {
+  sessionState = _createFreshState(saved.level || 'starter', apiKey, saved.language || 'en');
+  sessionState.totalQuestions = saved.totalQuestions || 0;
+  sessionState.totalCorrect   = saved.totalCorrect   || 0;
+  sessionState.streak         = saved.streak         || 0;
+  sessionState.streakErrors   = saved.streakErrors   || 0;
+  sessionState.categories     = saved.categories     || {};
+  sessionState.history        = saved.history        || [];
+  sessionState.consecutiveErrorsByCategory = saved.consecutiveErrorsByCategory || {};
+  sessionState.startTime      = saved.startTime      || Date.now();
+  sessionState.levelSuggestionShown = saved.levelSuggestionShown || false;
   return sessionState;
 }
 
@@ -224,6 +246,11 @@ function _computeAdaptiveTriggers(category, elapsed) {
 /** Change le niveau de la session. */
 function setLevel(newLevel) {
   if (LEVELS[newLevel]) sessionState.level = newLevel;
+}
+
+/** Change la langue de la session ('en' ou 'es'). */
+function setLanguage(lang) {
+  if (lang === 'en' || lang === 'es') sessionState.language = lang;
 }
 
 /** Mémorise la clé API (jamais persistée sur disque). */

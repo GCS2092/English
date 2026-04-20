@@ -13,6 +13,7 @@ const App = {
   questionStartTime: null,
   pendingAIRequest: false,
   initialized: false,
+  selectedLanguage: 'en',       // 'en' | 'es'
 };
 
 // ─── INITIALISATION ──────────────────────────────────────────
@@ -20,13 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
   _initOnlineStatus();
   _initVoice();
   _bindStaticEvents();
+  _checkResumeBanner();
   _showScreen('screen-welcome');
   _registerServiceWorker();
 });
 
 function _registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
 
@@ -55,14 +57,96 @@ function _initVoice() {
   if (sttBtn) sttBtn.disabled = !result.sttOk;
 }
 
-// ─── BINDING ÉVÉNEMENTS STATIQUES ───────────────────────────
+// ─── BANNIÈRE REPRISE ─────────────────────────────────────────
+function _checkResumeBanner() {
+  const summary = getSaveSummary();
+  if (!summary) return;
+  const banner = document.getElementById('resume-banner');
+  const info   = document.getElementById('resume-banner-info');
+  if (!banner || !info) return;
+  info.textContent =
+    `${summary.langFlag} ${summary.levelLabel} · ${summary.totalCorrect}/${summary.totalQuestions} (${summary.pct}%) · Série ${summary.streak} · ${summary.savedAgo}`;
+  banner.style.display = '';
+}
+
+// ─── SÉLECTION LANGUE ─────────────────────────────────────────
+App._selectLang = function(lang) {
+  App.selectedLanguage = lang;
+  document.getElementById('lang-btn-en')?.classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-es')?.classList.toggle('active', lang === 'es');
+
+  // Mettre à jour les descriptions des niveaux selon la langue
+  const descs = {
+    en: {
+      starter:    'To Be, To Have, Alphabet, Vocabulaire de base. Idéal pour débutants.',
+      builder:    'Present Perfect, Past Simple, WH Questions, Idiomes. Niveau intermédiaire.',
+      challenger: 'Traductions complexes, conjugaisons avancées, pièges grammaticaux.',
+    },
+    es: {
+      starter:    'Ser/Estar, Tener, Présent, Vocabulaire. Idéal para principiantes.',
+      builder:    'Passé, Futur, Questions, Nombres et temps. Niveau intermédiaire.',
+      challenger: 'Traductions, conjugaisons irrégulières, expressions idiomatiques.',
+    },
+  };
+  const d = descs[lang] || descs.en;
+  _setText('level-desc-starter',    d.starter);
+  _setText('level-desc-builder',    d.builder);
+  _setText('level-desc-challenger', d.challenger);
+
+  // Mettre à jour le héros
+  const icon  = document.getElementById('hero-icon');
+  const title = document.getElementById('welcome-title');
+  const sub   = document.getElementById('welcome-sub');
+  if (icon)  icon.textContent  = lang === 'es' ? '📙' : '📘';
+  if (title) title.textContent = lang === 'es' ? 'CTI Español' : 'CTI English';
+  if (sub)   sub.textContent   = lang === 'es'
+    ? 'Revisión adaptativa de español · Dakar CTI'
+    : 'Révision adaptative · Dakar CTI';
+};
+
+// ─── BINDING ÉVÉNEMENTS STATIQUES ───────────────────────────────────────
 function _bindStaticEvents() {
   // Bouton démarrer → écran sélection niveau
   _on('btn-start', 'click', () => _showScreen('screen-level'));
 
+  // Reprendre une session sauvegardée
+  _on('btn-resume', 'click', () => {
+    const saved = loadProgress();
+    if (!saved) { _showToast('Aucune sauvegarde trouvée.', 'warning'); return; }
+    App.selectedLanguage = saved.language || 'en';
+    restoreFromSave(saved, null);
+    _startGame();
+    _showToast('▶ Session reprise !', 'success');
+  });
+
+  // Ignorer la sauvegarde
+  _on('btn-discard-save', 'click', () => {
+    clearProgress();
+    document.getElementById('resume-banner').style.display = 'none';
+    _showToast('Nouvelle session.', 'info');
+  });
+
   // Sélection niveau
   ['starter', 'builder', 'challenger'].forEach(lvl => {
     _on(`btn-level-${lvl}`, 'click', () => _onLevelSelected(lvl));
+  });
+
+  // Sélection langue
+  _on('lang-btn-en', 'click', () => App._selectLang('en'));
+  _on('lang-btn-es', 'click', () => App._selectLang('es'));
+
+  // Tableau de conjugaison
+  _on('btn-go-verbs', 'click', () => {
+    VerbScreen.setLang(App.selectedLanguage || 'en');
+    _showScreen('screen-verbs');
+  });
+
+  // Jouer SANS clé IA (bouton principal)
+  _on('btn-play-nokey', 'click', () => {
+    const level = document.getElementById('selected-level-display')?.dataset?.level || 'builder';
+    initSession(level, '', App.selectedLanguage);
+    _showToast('🚀 Mode statique — 320+ questions prêtes !', 'info');
+    _startGame();
   });
 
   // Clé API — toggle affichage
@@ -109,8 +193,16 @@ function _bindStaticEvents() {
   _on('btn-export-json', 'click', _onExportJSON);
   _on('btn-share', 'click', _onShare);
 
-  // Recommencer
-  _on('btn-restart', 'click', () => _showScreen('screen-welcome'));
+  // Recommencer — effacer la sauvegarde + reset
+  _on('btn-restart', 'click', () => {
+    clearProgress();
+    if (App.timerInterval) { clearInterval(App.timerInterval); App.timerInterval = null; }
+    App.selectedLanguage = 'en';
+    _showScreen('screen-welcome');
+    // Réinitialiser le sélecteur de langue
+    document.getElementById('lang-btn-en')?.classList.add('active');
+    document.getElementById('lang-btn-es')?.classList.remove('active');
+  });
 
   // Changer de niveau depuis la barre de progression
   _on('btn-change-level', 'click', () => _showScreen('screen-level'));
@@ -130,6 +222,9 @@ function _onLevelSelected(level) {
   document.getElementById('selected-level-display').textContent =
     { starter: 'Starter 🌱', builder: 'Builder 🔨', challenger: 'Challenger 🏆' }[level] || level;
   document.getElementById('selected-level-display').dataset.level = level;
+  // Mettre à jour le titre de la topbar selon la langue
+  const topbar = document.getElementById('apikey-topbar-title');
+  if (topbar) topbar.textContent = App.selectedLanguage === 'es' ? '📙 CTI Español' : '📘 CTI English';
 }
 
 // ─── VALIDATION CLÉ API ──────────────────────────────────────
@@ -138,8 +233,8 @@ async function _onValidateApiKey() {
   const keyInput = document.getElementById('input-apikey');
   const key = keyInput?.value?.trim() || '';
 
-  // Initialiser la session (avec ou sans clé)
-  initSession(level, key);
+  // Initialiser la session (avec ou sans clé + langue sélectionnée)
+  initSession(level, key, App.selectedLanguage);
 
   if (!key) {
     _showToast('Mode hors ligne — questions statiques uniquement.', 'info');
@@ -191,15 +286,16 @@ async function _nextQuestion() {
   _show('section-question-loader');
 
   const state = getState();
-  const allCats = getAllCategories();
+  const allCats = state.language === 'es' ? getAllCategoriesES() : getAllCategories();
 
-  // Sélection de la catégorie
+  // Sélection de la catégorie (pool selon langue)
+  const isES = state.language === 'es';
   const category = selectWeightedCategory(allCats, state.categories);
   App.currentCategory = category;
   _updateAdaptivePanel();
 
   // Vérifier si on doit générer via IA
-  const poolSize = getPoolSizeForCategory(category);
+  const poolSize = isES ? getPoolSizeForCategoryES(category) : getPoolSizeForCategory(category);
   const catStats = state.categories[category];
   const askedIds = getAskedQuestionIds();
   const wantsAI = shouldGenerateAI(category, catStats, poolSize) &&
@@ -227,14 +323,17 @@ async function _nextQuestion() {
     _hide('section-ai-loader');
   }
 
-  // Fallback pool statique
+  // Fallback pool statique (anglais ou espagnol)
   if (!question) {
-    question = pickQuestion(category, state.level, askedIds);
+    question = isES
+      ? pickQuestionES(category, state.level, askedIds)
+      : pickQuestion(category, state.level, askedIds);
   }
-
-  // Pool totalement épuisé → recycler (réinitialiser les IDs)
+  // Pool épuisé → recycler
   if (!question) {
-    question = pickQuestion(category, state.level, []);
+    question = isES
+      ? pickQuestionES(category, state.level, [])
+      : pickQuestion(category, state.level, []);
   }
 
   if (!question) {
@@ -372,13 +471,16 @@ async function _onAnswered({ correct, userAnswer, correctAnswer }) {
   _setText('correction-status', correct ? '✅ Correct !' : '❌ Incorrect');
   _setText('correction-expected', correct ? `✔ ${correctAnswer}` : `Bonne réponse : ${correctAnswer}`);
 
-  // Explications bilingues FR + EN
+  // Explications bilingues FR + langue cible
   const fr = q.explication_fr || '';
   const en = q.explication_en || '';
   _setText('correction-explanation', fr);
   _setText('correction-example', en);
   const bilingualEl = document.getElementById('correction-bilingual');
   if (bilingualEl) bilingualEl.style.display = (fr || en) ? '' : 'none';
+  // Adapter le drapeau de la 2ème langue
+  const flag2 = document.querySelector('#correction-bilingual .correction-lang-row:last-child .lang-flag');
+  if (flag2) flag2.textContent = getState().language === 'es' ? '🇪🇸' : '🇬🇧';
 
   // TTS correction
   if (isTTSActive()) speakCorrection(correctAnswer, q.explication_en, getState().level);
@@ -405,6 +507,12 @@ async function _onAnswered({ correct, userAnswer, correctAnswer }) {
     } catch (_) {
       _hide('correction-ai-loader');
     }
+  }
+
+  // Sauvegarde automatique hors ligne (avec retour visuel)
+  if (!getState().isOnline) {
+    const saved = saveProgress(getState());
+    if (saved) _showToast('💾 Progression sauvegardée', 'info');
   }
 
   // Mise à jour tableau de bord
@@ -533,7 +641,7 @@ function _updateAIStatusBar() {
     txt.textContent = `IA : clé configurée, mais hors ligne`;
   } else {
     bar.className = 'ai-status-bar ai-inactive';
-    txt.textContent = `IA : non configurée — mode statique (206 questions)`;
+    txt.textContent = `IA : non configurée — mode statique (320+ questions EN+ES)`;
   }
 }
 
@@ -628,6 +736,11 @@ function _showFeedback(correct) {
 
 // ─── NAVIGATION ÉCRANS ───────────────────────────────────────
 function _showScreen(id) {
+  // Stopper le timer si on quitte l'écran de jeu
+  if (id !== 'screen-game' && App.timerInterval) {
+    clearInterval(App.timerInterval);
+    App.timerInterval = null;
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(id);
   if (target) target.classList.add('active');
@@ -678,3 +791,206 @@ function _toggleBtnActive(id, active) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('btn-active', active);
 }
+
+// ══════════════════════════════════════════════════════════════
+// VERBSCREEN — Contrôleur du tableau de conjugaison interactif
+// ══════════════════════════════════════════════════════════════
+const VerbScreen = (() => {
+  let _lang        = 'en';
+  let _currentVerb = null;
+  let _currentTense= null;
+
+  // ── INITIALISATION LANGUE ────────────────────────────────────
+  function setLang(lang) {
+    _lang = lang === 'es' ? 'es' : 'en';
+    document.getElementById('vb-lang-en')?.classList.toggle('active', _lang === 'en');
+    document.getElementById('vb-lang-es')?.classList.toggle('active', _lang === 'es');
+    _currentVerb  = null;
+    _currentTense = null;
+    _populateVerbSelect();
+    _resetTable();
+  }
+
+  // ── REMPLIR LE SELECT VERBES ──────────────────────────────────
+  function _populateVerbSelect() {
+    const sel  = document.getElementById('vb-select-verb');
+    if (!sel) return;
+    const list = getVerbList(_lang);
+    sel.innerHTML = '<option value="">-- Choisir un verbe --</option>';
+    list.forEach(v => {
+      const tag  = v.type === 'irregular' ? ' ★' : '';
+      const opt  = document.createElement('option');
+      opt.value       = v.id;
+      opt.textContent = `${v.verb}${tag} — ${v.fr}`;
+      sel.appendChild(opt);
+    });
+    // Réinitialiser le select de temps
+    const selT = document.getElementById('vb-select-tense');
+    if (selT) selT.innerHTML = '<option value="">-- Choisir un temps --</option>';
+  }
+
+  // ── CHANGEMENT DE VERBE ──────────────────────────────────────
+  function onVerbChange() {
+    const id   = document.getElementById('vb-select-verb')?.value;
+    _currentTense = null;
+    if (!id) { _resetTable(); return; }
+    _currentVerb = getVerb(id, _lang);
+    if (!_currentVerb) { _resetTable(); return; }
+
+    // Peupler les temps
+    const selT  = document.getElementById('vb-select-tense');
+    const tKeys = Object.keys(_currentVerb.tenses);
+    selT.innerHTML = '<option value="">-- Choisir un temps --</option>';
+    tKeys.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value       = k;
+      opt.textContent = _currentVerb.tenses[k].label;
+      selT.appendChild(opt);
+    });
+    _resetTable();
+  }
+
+  // ── CHANGEMENT DE TEMPS ──────────────────────────────────────
+  function onTenseChange() {
+    const key = document.getElementById('vb-select-tense')?.value;
+    if (!key || !_currentVerb) { _resetTable(); return; }
+    _currentTense = key;
+    _buildTable();
+  }
+
+  // ── CONSTRUIRE LE TABLEAU ────────────────────────────────────
+  function _buildTable() {
+    if (!_currentVerb || !_currentTense) return;
+    const tenseData = _currentVerb.tenses[_currentTense];
+    const subjects  = getSubjects(_lang);
+
+    // En-tête verbe
+    const header = document.getElementById('vb-verb-header');
+    if (header) header.style.display = '';
+    const prefix = _lang === 'es' ? '' : 'to ';
+    _setText('vb-verb-name', `${prefix}${_currentVerb.verb}`);
+    _setText('vb-verb-trans', _currentVerb.fr);
+    const typeEl = document.getElementById('vb-verb-type');
+    if (typeEl) {
+      typeEl.textContent  = _currentVerb.type === 'irregular' ? '★ irrégulier' : '✓ régulier';
+      typeEl.className    = `verb-type-badge ${_currentVerb.type}`;
+    }
+    _setText('vb-rule', `💡 ${tenseData.rule_fr}`);
+
+    // Tableau des formes
+    const table = document.getElementById('vb-table');
+    if (!table) return;
+    table.innerHTML = '';
+    subjects.forEach((subj, i) => {
+      const row    = document.createElement('div');
+      row.className = 'conj-row';
+      row.innerHTML = `
+        <span class="conj-subject">${subj}</span>
+        <input class="conj-input" type="text" id="vb-inp-${i}"
+               placeholder="…" autocomplete="off" autocorrect="off"
+               autocapitalize="off" spellcheck="false"
+               onkeydown="if(event.key==='Enter'){const n=document.getElementById('vb-inp-${i+1}');if(n)n.focus();else VerbScreen.check();}">
+        <span class="conj-icon" id="vb-ico-${i}"></span>`;
+      table.appendChild(row);
+    });
+
+    // Afficher boutons
+    _show('vb-btn-check');
+    _show('vb-btn-reveal');
+    _hide('vb-btn-retry');
+    const scoreBar = document.getElementById('vb-score-bar');
+    if (scoreBar) scoreBar.style.display = 'none';
+
+    // Focus premier champ
+    setTimeout(() => document.getElementById('vb-inp-0')?.focus(), 100);
+  }
+
+  // ── VÉRIFIER ─────────────────────────────────────────────────
+  function check() {
+    if (!_currentVerb || !_currentTense) return;
+    const tenseData = _currentVerb.tenses[_currentTense];
+    const userForms = Array.from({ length: 6 }, (_, i) =>
+      (document.getElementById(`vb-inp-${i}`)?.value || '').trim()
+    );
+    const { results, score, total } = checkConjugation(userForms, tenseData.forms);
+
+    results.forEach((ok, i) => {
+      const inp = document.getElementById(`vb-inp-${i}`);
+      const ico = document.getElementById(`vb-ico-${i}`);
+      if (inp) { inp.classList.toggle('correct', ok); inp.classList.toggle('wrong', !ok); inp.disabled = true; }
+      if (ico) ico.textContent = ok ? '✅' : '❌';
+    });
+
+    const pct = Math.round(score / total * 100);
+    const label = pct === 100 ? '🏆 Parfait ! Toutes les formes sont correctes.'
+      : pct >= 66 ? `👍 Bien ! ${score}/${total} formes correctes.`
+      : `💪 Continue ! ${score}/${total} formes correctes.`;
+
+    _setText('vb-score-num', `${score}/${total}`);
+    _setText('vb-score-label', label);
+    const scoreBar = document.getElementById('vb-score-bar');
+    if (scoreBar) scoreBar.style.display = '';
+
+    _hide('vb-btn-check');
+    _show('vb-btn-retry');
+  }
+
+  // ── VOIR LES RÉPONSES ────────────────────────────────────────
+  function reveal() {
+    if (!_currentVerb || !_currentTense) return;
+    const tenseData = _currentVerb.tenses[_currentTense];
+    tenseData.forms.forEach((form, i) => {
+      const inp = document.getElementById(`vb-inp-${i}`);
+      const ico = document.getElementById(`vb-ico-${i}`);
+      if (inp) {
+        const wasEmpty = !inp.value.trim();
+        inp.value    = form;
+        inp.disabled = true;
+        inp.className = 'conj-input ' + (wasEmpty ? 'wrong' : 'correct');
+      }
+      if (ico) ico.textContent = '👁';
+    });
+    _hide('vb-btn-check');
+    _hide('vb-btn-reveal');
+    _show('vb-btn-retry');
+    const scoreBar = document.getElementById('vb-score-bar');
+    if (scoreBar) scoreBar.style.display = 'none';
+  }
+
+  // ── RÉESSAYER ────────────────────────────────────────────────
+  function retry() {
+    for (let i = 0; i < 6; i++) {
+      const inp = document.getElementById(`vb-inp-${i}`);
+      const ico = document.getElementById(`vb-ico-${i}`);
+      if (inp) { inp.value = ''; inp.disabled = false; inp.className = 'conj-input'; }
+      if (ico) ico.textContent = '';
+    }
+    const scoreBar = document.getElementById('vb-score-bar');
+    if (scoreBar) scoreBar.style.display = 'none';
+    _show('vb-btn-check');
+    _show('vb-btn-reveal');
+    _hide('vb-btn-retry');
+    setTimeout(() => document.getElementById('vb-inp-0')?.focus(), 50);
+  }
+
+  // ── RÉINITIALISER ────────────────────────────────────────────
+  function _resetTable() {
+    const table = document.getElementById('vb-table');
+    if (table) table.innerHTML = '';
+    const header = document.getElementById('vb-verb-header');
+    if (header) header.style.display = 'none';
+    const scoreBar = document.getElementById('vb-score-bar');
+    if (scoreBar) scoreBar.style.display = 'none';
+    _hide('vb-btn-check');
+    _hide('vb-btn-reveal');
+    _hide('vb-btn-retry');
+  }
+
+  // ── RETOUR ───────────────────────────────────────────────────
+  function goBack() {
+    _showScreen('screen-welcome');
+  }
+
+  // API publique
+  return { setLang, onVerbChange, onTenseChange, check, reveal, retry, goBack };
+})();

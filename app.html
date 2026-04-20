@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Révision d'anglais adaptative CTI — Dakar">
 <title>CTI English 📘</title>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <style>
 /* ══════════════════════════════════════════════════════════
    CTI English PWA — Design v2
@@ -398,6 +398,75 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 .end-medal{font-size:3rem;text-align:center;margin:8px 0;animation:medalBounce .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes medalBounce{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0)}}
 
+/* ── VERBES TABLE ──────────────────────────────────────────── */
+.verb-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.verb-type-badge{
+  font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.regular{background:#e8f7e8;color:var(--green-dark);border:1px solid var(--green)}
+.irregular{background:#fff3e0;color:#7a4200;border:1px solid #d4a840}
+
+.verb-selectors{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.verb-selectors select{
+  padding:10px 12px;border-radius:var(--radius-xs);border:1.5px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:.88rem;font-weight:600;
+  cursor:pointer;width:100%;
+}
+.verb-selectors select:focus{outline:none;border-color:var(--blue)}
+
+.conj-table{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.conj-row{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:8px}
+.conj-subject{font-size:.78rem;font-weight:700;color:var(--text2);text-align:right}
+.conj-input{
+  padding:9px 12px;border-radius:var(--radius-xs);border:1.5px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:.9rem;font-weight:500;
+  transition:border-color .15s,background .15s;
+}
+.conj-input:focus{outline:none;border-color:var(--blue);background:var(--blue-pale2)}
+.conj-input.correct{border-color:var(--green);background:#e8f7e8;color:var(--green-dark)}
+.conj-input.wrong{border-color:var(--red);background:#fde8e8;color:var(--red-dark)}
+.conj-input:disabled{cursor:default}
+.conj-icon{font-size:1rem;width:20px;text-align:center}
+
+.conj-rule{
+  font-size:.78rem;color:var(--blue);background:var(--blue-pale2);
+  border-left:3px solid var(--blue);padding:8px 12px;
+  border-radius:0 var(--radius-xs) var(--radius-xs) 0;margin:8px 0;
+  line-height:1.5;
+}
+.conj-score-bar{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-radius:var(--radius);background:var(--bg3);margin-top:10px;
+  box-shadow:var(--shadow);
+}
+.conj-score-num{font-size:1.5rem;font-weight:800;color:var(--blue)}
+.conj-score-label{font-size:.8rem;color:var(--text2);flex:1}
+.verb-actions{display:grid;gap:8px;margin-top:10px}
+
+/* ── LANGUAGE PICKER ───────────────────────────────────────── */
+.lang-picker{display:flex;gap:8px;margin-bottom:14px}
+.lang-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 10px;border-radius:var(--radius);border:2px solid var(--border);
+  background:var(--bg3);cursor:pointer;font-size:.9rem;font-weight:700;
+  color:var(--text);transition:all .15s;
+}
+.lang-btn:hover{border-color:var(--blue);background:var(--blue-pale)}
+.lang-btn.active{border-color:var(--blue);background:var(--blue-pale2);color:var(--blue)}
+.lang-btn .lang-flag-big{font-size:1.5rem}
+
+/* ── RESUME BANNER ──────────────────────────────────────────── */
+.resume-banner{
+  background:linear-gradient(135deg,var(--blue-pale2),var(--blue-pale));
+  border:1.5px solid var(--blue);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:12px;
+}
+.resume-banner-title{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.resume-banner-info{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.5}
+.resume-banner-actions{display:flex;gap:8px}
+.resume-banner-actions .btn{flex:1;padding:9px 6px;font-size:.82rem}
+
 /* ── ADAPTIVE PANEL ─────────────────────────────────────────── */
 .adaptive-panel{
   background:var(--bg3);border-radius:var(--radius);
@@ -488,40 +557,130 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <!-- ══ ÉCRAN 1 — ACCUEIL ══════════════════════════════════════ -->
 <section id="screen-welcome" class="screen active" role="main">
   <div class="hero">
-    <div class="hero-icon">📘</div>
-    <h1>CTI English</h1>
-    <p>Révision d'anglais adaptative<br>pour francophones · Dakar CTI</p>
+    <div class="hero-icon" id="hero-icon">📘</div>
+    <h1 id="welcome-title">CTI English</h1>
+    <p id="welcome-sub">Révision adaptative · Dakar CTI</p>
   </div>
   <div class="container" style="flex:1;margin-top:4px">
+
+    <!-- Bannière reprise (hors ligne) -->
+    <div class="resume-banner" id="resume-banner" style="display:none">
+      <div class="resume-banner-title">⏸ Session sauvegardée</div>
+      <div class="resume-banner-info" id="resume-banner-info">—</div>
+      <div class="resume-banner-actions">
+        <button id="btn-resume" class="btn btn-primary">▶ Reprendre</button>
+        <button id="btn-discard-save" class="btn btn-secondary">✕ Nouvelle session</button>
+      </div>
+    </div>
+
     <div class="features">
       <div class="feat-row"><div class="feat-icon">🎯</div><div class="feat-text"><strong>Adaptatif</strong> — Le niveau s'ajuste à tes résultats en temps réel</div></div>
       <div class="feat-row"><div class="feat-icon">🤖</div><div class="feat-text"><strong>IA Claude Sonnet</strong> — Explications personnalisées &amp; exercices générés</div></div>
       <div class="feat-row"><div class="feat-icon">🔊</div><div class="feat-text"><strong>Voix</strong> — Lecture TTS &amp; dictée vocale STT intégrées</div></div>
-      <div class="feat-row"><div class="feat-icon">📵</div><div class="feat-text"><strong>Hors ligne</strong> — 206 questions statiques sans connexion</div></div>
+      <div class="feat-row"><div class="feat-icon">📵</div><div class="feat-text"><strong>Hors ligne</strong> — 320+ questions EN+ES · progression sauvegardée hors ligne</div></div>
     </div>
     <button id="btn-start" class="btn btn-primary" style="margin-top:4px" aria-label="Commencer">
       Commencer la révision 🚀
     </button>
+    <button id="btn-go-verbs" class="btn btn-secondary" style="margin-top:8px">
+      📖 Tableau de conjugaison
+    </button>
+  </div>
+</section>
+
+<!-- ══ ÉCRAN CONJUGAISON ═══════════════════════════════════════ -->
+<section id="screen-verbs" class="screen" role="main">
+  <div class="topbar">
+    <span class="topbar-title">📖 Conjugaison</span>
+    <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
+  </div>
+  <div class="container">
+
+    <!-- Sélecteurs langue / verbe / temps -->
+    <div style="margin:14px 0 8px">
+      <div style="font-size:.95rem;font-weight:800;color:var(--text)">Entraîne-toi sur les conjugaisons</div>
+      <div style="font-size:.78rem;color:var(--text2);margin-top:2px">Sélectionne un verbe et un temps, puis remplis toutes les formes.</div>
+    </div>
+
+    <div class="lang-picker" style="margin-bottom:10px">
+      <button class="lang-btn active" id="vb-lang-en" onclick="VerbScreen.setLang('en')">
+        <span class="lang-flag-big">🇬🇧</span><span>Anglais</span>
+      </button>
+      <button class="lang-btn" id="vb-lang-es" onclick="VerbScreen.setLang('es')">
+        <span class="lang-flag-big">🇪🇸</span><span>Español</span>
+      </button>
+    </div>
+
+    <div class="verb-selectors">
+      <select id="vb-select-verb" onchange="VerbScreen.onVerbChange()">
+        <option value="">-- Choisir un verbe --</option>
+      </select>
+      <select id="vb-select-tense" onchange="VerbScreen.onTenseChange()">
+        <option value="">-- Choisir un temps --</option>
+      </select>
+    </div>
+
+    <!-- En-tête verbe sélectionné -->
+    <div id="vb-verb-header" style="display:none">
+      <div class="verb-header">
+        <span style="font-size:1.2rem;font-weight:800;color:var(--text)" id="vb-verb-name">to work</span>
+        <span style="font-size:.82rem;color:var(--text2)" id="vb-verb-trans">—</span>
+        <span class="verb-type-badge" id="vb-verb-type">régulier</span>
+      </div>
+      <div class="conj-rule" id="vb-rule"></div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="conj-table" id="vb-table"></div>
+
+    <!-- Score -->
+    <div class="conj-score-bar" id="vb-score-bar" style="display:none">
+      <div class="conj-score-num" id="vb-score-num">0/6</div>
+      <div class="conj-score-label" id="vb-score-label">—</div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="verb-actions">
+      <button id="vb-btn-check" class="btn btn-primary" style="display:none"
+              onclick="VerbScreen.check()">✔ Vérifier mes réponses</button>
+      <button id="vb-btn-reveal" class="btn btn-secondary" style="display:none"
+              onclick="VerbScreen.reveal()">👁 Voir les réponses</button>
+      <button id="vb-btn-retry" class="btn btn-secondary" style="display:none"
+              onclick="VerbScreen.retry()">🔄 Réessayer</button>
+      <button class="btn btn-secondary" onclick="VerbScreen.goBack()">← Retour</button>
+    </div>
   </div>
 </section>
 
 <!-- ══ ÉCRAN 2 — NIVEAU ═══════════════════════════════════════ -->
 <section id="screen-level" class="screen" role="main">
   <div class="topbar">
-    <span class="topbar-title">📘 CTI English</span>
+    <span class="topbar-title">📘 CTI</span>
     <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
   </div>
   <div class="container">
-    <div style="margin:16px 0 6px">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--text)">Choisis ton niveau</div>
-      <div style="font-size:.82rem;color:var(--text2);margin-top:3px">Tu pourras changer à tout moment pendant la session.</div>
+    <div style="margin:16px 0 8px">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--text)">Choisis ta langue &amp; ton niveau</div>
+      <div style="font-size:.82rem;color:var(--text2);margin-top:3px">Tu pourras changer à tout moment.</div>
+    </div>
+
+    <!-- Sélecteur de langue -->
+    <div class="lang-picker">
+      <button class="lang-btn active" id="lang-btn-en" onclick="App._selectLang('en')">
+        <span class="lang-flag-big">🇬🇧</span>
+        <span>Anglais</span>
+      </button>
+      <button class="lang-btn" id="lang-btn-es" onclick="App._selectLang('es')">
+        <span class="lang-flag-big">🇪🇸</span>
+        <span>Español</span>
+      </button>
     </div>
 
     <button id="btn-level-starter" class="level-card starter" aria-label="Niveau Starter">
       <div class="lc-icon">🌱</div>
       <div class="lc-info">
         <div class="level-name">Starter</div>
-        <div class="level-desc">To Be, To Have, Alphabet, Vocabulaire de base. Idéal pour débutants.</div>
+        <div class="level-desc" id="level-desc-starter">To Be, To Have, Alphabet, Vocabulaire de base. Idéal pour débutants.</div>
       </div>
       <div class="lc-arrow">›</div>
     </button>
@@ -530,7 +689,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
       <div class="lc-icon">🔨</div>
       <div class="lc-info">
         <div class="level-name">Builder</div>
-        <div class="level-desc">Present Perfect, Past Simple, WH Questions, Idiomes. Niveau intermédiaire.</div>
+        <div class="level-desc" id="level-desc-builder">Present Perfect, Past Simple, WH Questions, Idiomes. Niveau intermédiaire.</div>
       </div>
       <div class="lc-arrow">›</div>
     </button>
@@ -539,7 +698,7 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
       <div class="lc-icon">🏆</div>
       <div class="lc-info">
         <div class="level-name">Challenger</div>
-        <div class="level-desc">Traductions complexes, conjugaisons avancées, pièges grammaticaux.</div>
+        <div class="level-desc" id="level-desc-challenger">Traductions complexes, conjugaisons avancées, pièges grammaticaux.</div>
       </div>
       <div class="lc-arrow">›</div>
     </button>
@@ -549,37 +708,64 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <!-- ══ ÉCRAN 3 — CLÉ API ══════════════════════════════════════ -->
 <section id="screen-apikey" class="screen" role="main">
   <div class="topbar">
-    <span class="topbar-title">📘 CTI English</span>
+    <span class="topbar-title" id="apikey-topbar-title">📘 CTI English</span>
     <div class="topbar-right"><span class="badge-online-status badge-online">● En ligne</span></div>
   </div>
   <div class="container">
-    <div style="margin:16px 0 12px">
+
+    <div style="margin:16px 0 10px">
       <div class="step-pill">✓ Niveau sélectionné : <strong id="selected-level-display" data-level="builder">Builder 🔨</strong></div>
-      <div style="font-size:1rem;font-weight:700;color:var(--text)">Activer l'IA <span style="font-size:.78rem;font-weight:400;color:var(--text2)">(optionnel)</span></div>
     </div>
 
-    <div class="card">
-      <div class="card-title">🔑 Clé API Anthropic</div>
-      <div class="apikey-wrap">
-        <input type="password" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" aria-label="Clé API Anthropic">
-        <button id="btn-toggle-apikey" class="btn btn-secondary btn-sm" aria-label="Voir/cacher">👁</button>
+    <!-- Zone principale : jouer SANS clé -->
+    <div class="card" style="background:var(--blue-pale2);border:1.5px solid var(--blue);margin-bottom:10px">
+      <div style="text-align:center;padding:4px 0 8px">
+        <div style="font-size:1.8rem;margin-bottom:6px">🚀</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:4px">Jouer maintenant</div>
+        <div style="font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:12px">
+          320+ questions disponibles <strong>sans clé</strong>.<br>
+          Questions adaptatives · Voix TTS/STT · Sauvegarde hors ligne
+        </div>
+        <button id="btn-play-nokey" class="btn btn-primary" style="width:100%;font-size:1rem">
+          Jouer sans clé IA →
+        </button>
       </div>
-      <p class="hint-text">Active les <strong>explications IA</strong>, la <strong>génération d'exercices</strong> et les <strong>rapports personnalisés</strong>.<br>🔒 Non stockée — disparaît à la fermeture de la page.</p>
     </div>
 
-    <div class="card">
-      <div class="card-title">📋 Obtenir une clé gratuite</div>
-      <p class="hint-text">
-        1 · Crée un compte sur <strong>console.anthropic.com</strong><br>
-        2 · Va dans <strong>API Keys</strong> → Créer une clé<br>
-        3 · Colle la clé ci-dessus (commence par <code>sk-ant-</code>)
-      </p>
-    </div>
-
-    <button id="btn-validate-apikey" class="btn btn-primary">Continuer →</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('input-apikey').value='';document.getElementById('btn-validate-apikey').click()">
-      Continuer sans clé (hors ligne)
+    <!-- Option avancée : clé IA (repliable) -->
+    <button class="adaptive-toggle" onclick="
+      const b=document.getElementById('apikey-section');
+      const a=document.getElementById('apikey-arrow');
+      const open=b.style.display!=='none';
+      b.style.display=open?'none':'';
+      a.textContent=open?'▾':'▴';
+    " style="width:100%;margin-bottom:0">
+      <span>🤖 Activer l’IA Claude Sonnet <span style="font-size:.72rem;font-weight:500;color:var(--text2)">(optionnel)</span></span>
+      <span id="apikey-arrow">▾</span>
     </button>
+
+    <div id="apikey-section" style="display:none">
+      <div class="card" style="margin-top:8px">
+        <div class="card-title">🔑 Clé API Anthropic</div>
+        <div class="apikey-wrap">
+          <input type="password" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" aria-label="Clé API Anthropic">
+          <button id="btn-toggle-apikey" class="btn btn-secondary btn-sm" aria-label="Voir/cacher">👁</button>
+        </div>
+        <p class="hint-text">Active les <strong>explications IA</strong>, la <strong>génération d’exercices</strong> et les <strong>rapports personnalisés</strong>.<br>🔒 Non stockée — disparaît à la fermeture.</p>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <div class="card-title">📋 Obtenir une clé gratuite</div>
+        <p class="hint-text">
+          1 · Crée un compte sur <strong>console.anthropic.com</strong><br>
+          2 · Va dans <strong>API Keys</strong> → Créer une clé<br>
+          3 · Colle la clé ci-dessus (commence par <code>sk-ant-</code>)
+        </p>
+      </div>
+      <button id="btn-validate-apikey" class="btn btn-primary" style="margin-top:4px;width:100%">
+        Continuer avec clé IA →
+      </button>
+    </div>
+
   </div>
 </section>
 
@@ -778,8 +964,11 @@ button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 <!-- ════════════════════════════════════════════════════════════
      SCRIPTS — Ordre d'inclusion important
 ═════════════════════════════════════════════════════════════ -->
+<script src="verbModule.js"></script>
 <script src="questionPool.js"></script>
+<script src="questionPool_es.js"></script>
 <script src="sessionState.js"></script>
+<script src="saveModule.js"></script>
 <script src="aiEngine.js"></script>
 <script src="adaptiveEngine.js"></script>
 <script src="voiceModule.js"></script>
@@ -811,10 +1000,11 @@ App._goToEnd = async function() {
     ring.style.background = `conic-gradient(${color} ${deg}deg, #ddd9d0 ${deg}deg)`;
   }
 
-  // Transition écran
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-end').classList.add('active');
-  window.scrollTo(0, 0);
+  // Session terminée → effacer la sauvegarde intermédiaire (pas de reprise possible)
+  clearProgress();
+
+  // Transition écran (utilise _showScreen pour stopper le timer)
+  _showScreen('screen-end');
 
   // Rapport IA
   if (state.apiKey && state.isOnline) {
